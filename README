@@ -63,3 +63,9 @@ balance: balance between the effect of song_history vs. vibe on the playlist out
     balance = float between 0 to 1: Everything in between
 """
     # magic code
+
+======================================================================================
+PROBLEMS:
+
+The possibility of different "vibe" identifiers for each cluster may make it difficult to implement a "vibe" input. 
+
