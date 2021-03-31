@@ -1,13 +1,65 @@
+
+
+Spotipy
+
+
+=====================================================================================
+WANT:
+
+Generate playlist
+
+
+=====================================================================================
+EXECUTION:
+
+Before input:
+- Using dataset, use Graph method to generate n clusters.
+
+Ready for input after generating clusters.
+Input is (user_history, vibe, balance)
+*Note vibe should be one of n generated clusters.
+
+Example input: ([id_1, id_2, id_3, ...], 'Hype', 0.4)
+Assume final output playlist length is 100.
+
+Process:
+    - Split the output into two parts: 40% based on user_history, 60% based on vibe.
+
+    - For the 40% (user_history based, this gives 40 songs):
+        - Generate "taste profile". See which of n clusters each song fits into, and 
+          profile should look like (10% vibe_1, 50% vibe_3, 40% vibe_7)
+        - Get 0.1 * 40 songs from vibe_1 cluster; 0.5 * 40 songs from vibe_3 cluster;
+          0.4 * 40 songs from vibe_7 clusters. You have 40 songs now.
+
+    - For the 60% (vibe based, this gives 60 songs)
+        - Get 60 songs from given vibe, cannot overlap from previous 40 user_history 
+          based songs.
+
+40 + 60, profit.
+
+
+=====================================================================================
+OTHER THINGS:
+- Graph-based algo should be crux of complexity: Should be complex af and better than
+  algos provided in A3.
+- Compare our algo with other algos (including A3 algo) and show ours is better.
+- Other input params?
+    - Allow songs from song_history? But how to decide which songs from song_history?
+      And also how many songs from song_history?
+
+
+=====================================================================================
+DRIVER:
+
 generate_playlist(song_history: list, vibe : str, balance: float)
 """
 Generate playlist
 
 song_history: user history (list of song ids)
-
 vibe: vibe chosen by user (one of many pre-defined vibes)
-
 balance: balance between the effect of song_history vs. vibe on the playlist output
     balance = 0: Playlist entirely based on song history
     balance = 1: Playlist entirely based on vibe
     balance = float between 0 to 1: Everything in between
 """
+    # magic code
