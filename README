@@ -1,0 +1,13 @@
+generate_playlist(song_history: list, vibe : str, balance: float)
+"""
+Generate playlist
+
+song_history: user history (list of song ids)
+
+vibe: vibe chosen by user (one of many pre-defined vibes)
+
+balance: balance between the effect of song_history vs. vibe on the playlist output
+    balance = 0: Playlist entirely based on song history
+    balance = 1: Playlist entirely based on vibe
+    balance = float between 0 to 1: Everything in between
+"""
