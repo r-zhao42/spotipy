@@ -16,9 +16,12 @@ class DBSCAN_Algo:
 
     def draw_with_matplotlib(self):
         def cycle_color(num):
-            colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+            # colors = ['#ff0000', '#ff8800', '#ffff00', '#88ff00', '#00ff00', '#00ff88',
+            #          '#00ffff', '#0088ff', '#0000ff', '#8800ff', '#ff00ff', '#ff0088']
+            colors = ['darkkhaki', 'turquoise', 'mediumorchid', 'teal', 'deepskyblue', 'olivedrab', 'lightgray',
+                      'black', 'maroon', 'rosybrown', 'darkseagreen', 'deeppink', 'darkorange', 'slateblue', 'chocolate']
             num = num % len(colors)
-            return colors[num] + '.'
+            return colors[num]
 
         x_min, x_max, y_min, y_max = [0, 0, 0, 0]
 
@@ -28,7 +31,8 @@ class DBSCAN_Algo:
                 x_max = max(x_max, point.x)
                 y_min = min(y_min, point.y)
                 y_max = max(y_max, point.y)
-                plt.plot([point.x], [point.y], cycle_color(cluster_id))
+                plt.plot([point.x], [point.y],
+                         color=cycle_color(cluster_id), marker='.')
 
         plt.axis([x_min - 1, x_max + 1, y_min - 1, y_max + 1])
         plt.show()
