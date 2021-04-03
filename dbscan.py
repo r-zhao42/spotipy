@@ -47,8 +47,8 @@ class DBSCAN_Algo:
                     expanded_cluster = Cluster([])
                     self.expand_cluster(
                         expanded_cluster, point, points_within_epsilon)
-            if expanded_cluster not in self.clusters:
-                self.clusters.append(expanded_cluster)
+                    if expanded_cluster not in self.clusters:
+                        self.clusters.append(expanded_cluster)
 
     def expand_cluster(self, cluster, cur_point, points_within_epsilon):
         cluster.add_point(cur_point)
