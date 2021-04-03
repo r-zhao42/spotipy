@@ -1,5 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class DBSCAN_Algo:
@@ -16,25 +17,20 @@ class DBSCAN_Algo:
 
     def draw_with_matplotlib(self):
         def cycle_color(num):
-            # colors = ['#ff0000', '#ff8800', '#ffff00', '#88ff00', '#00ff00', '#00ff88',
-            #          '#00ffff', '#0088ff', '#0000ff', '#8800ff', '#ff00ff', '#ff0088']
             colors = ['darkkhaki', 'turquoise', 'mediumorchid', 'teal', 'deepskyblue', 'olivedrab', 'lightgray',
                       'black', 'maroon', 'rosybrown', 'darkseagreen', 'deeppink', 'darkorange', 'slateblue', 'chocolate']
             num = num % len(colors)
             return colors[num]
 
-        x_min, x_max, y_min, y_max = [0, 0, 0, 0]
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
 
         for cluster_id, cluster in enumerate(self.clusters):
-            for point in cluster.points:
-                x_min = min(x_min, point.x)
-                x_max = max(x_max, point.x)
-                y_min = min(y_min, point.y)
-                y_max = max(y_max, point.y)
-                plt.plot([point.x], [point.y],
-                         color=cycle_color(cluster_id), marker='.')
+            xs = [point.x for point in cluster.points]
+            ys = [point.y for point in cluster.points]
+            zs = [0 for i in range(len(xs))]
+            ax.scatter(xs=xs, ys=ys, zs=zs, color=cycle_color(cluster_id), marker='.')
 
-        plt.axis([x_min - 1, x_max + 1, y_min - 1, y_max + 1])
         plt.show()
 
     def run(self):
@@ -119,7 +115,7 @@ def initialize_data(data):
 
 
 if __name__ == '__main__':
-    data = load_data('./test.csv')
+    data = load_data('./Test_Data_2D.csv')
     initialized_data = initialize_data(data)
 
     dbscan_obj = DBSCAN_Algo(data=initialized_data, epsilon=2, min_points=2)
