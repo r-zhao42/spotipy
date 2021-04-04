@@ -122,15 +122,18 @@ def initialize_data(data):
 
 
 if __name__ == '__main__':
+    # Good results:
+    # --csv-path=Spotify_Data_Columns_Removed_1000.csv --epsilon=1500 --min-points=15
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv-path', type=str)
+    parser.add_argument('--epsilon', type=float)
+    parser.add_argument('--min-points', type=float)
     args = parser.parse_args()
-    csv_path = args.csv_path
 
-    data = load_data(csv_path)
+    data = load_data(args.csv_path)
     initialized_data = initialize_data(data)
 
-    dbscan_obj = DBSCAN_Algo(data=initialized_data, epsilon=1500, min_points=15)
+    dbscan_obj = DBSCAN_Algo(data=initialized_data, epsilon=args.epsilon, min_points=args.min_points)
     dbscan_obj.run()
     dbscan_obj.print_clusters()
     dbscan_obj.draw_with_matplotlib()
