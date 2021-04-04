@@ -1,4 +1,4 @@
-import sys
+import argparse
 import csv
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -122,7 +122,11 @@ def initialize_data(data):
 
 
 if __name__ == '__main__':
-    csv_path = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--csv-path', type=str)
+    args = parser.parse_args()
+    csv_path = args.csv_path
+
     data = load_data(csv_path)
     initialized_data = initialize_data(data)
 
