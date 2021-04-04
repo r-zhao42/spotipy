@@ -1,5 +1,6 @@
 import argparse
 import csv
+import time
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -11,8 +12,12 @@ class DBSCAN_Algo:
         self.epsilon = epsilon
         self.min_points = min_points
         self.clusters = []
+        self.points_not_alone = 0
 
-    def print_clusters(self):
+    def print_summary(self):
+        print('SUMMARY:')
+        print(f'# OF POINTS: {len(self.data)}')
+        print(f'# OF CLUSTERS: {len(self.clusters)}')
         print('\n'.join([str(cluster) for cluster in self.clusters]))
 
     def draw_with_matplotlib(self):
@@ -37,6 +42,9 @@ class DBSCAN_Algo:
         plt.show()
 
     def run(self):
+        start_time = time.time()
+        print(f'Start time: {time.ctime(start_time)}')
+
         noise = Cluster([])
         self.clusters.append(noise)
 
@@ -47,17 +55,24 @@ class DBSCAN_Algo:
                 points_within_epsilon = self.get_points_within_epsilon(point)
                 if len(points_within_epsilon) < self.min_points:
                     noise.add_point(point)
+                    self.update_progress()
                 else:
                     expanded_cluster = Cluster([])
                     self.expand_cluster(expanded_cluster, point, points_within_epsilon)
                     if expanded_cluster not in self.clusters:
                         self.clusters.append(expanded_cluster)
-                        print(f'# of clusters: {len(self.clusters)}',
-                              f'# of points: {sum([len(cluster.points) for cluster in self.clusters])}',
-                              sep='  ')
+
+        end_time = time.time()
+        elapsed_ms = end_time - start_time
+        print('\r')
+        print(f'End time: {time.ctime(end_time)}')
+        print(f'Seconds elapsed: {(elapsed_ms / 1000) % 60}')
+        print(f'Minutes elapsed: {(elapsed_ms / (1000 * 60)) % 60}')
+        print(f'Hours elapsed: {(elapsed_ms / (1000 * 60 * 60)) % 60}')
 
     def expand_cluster(self, cluster, cur_point, points_within_epsilon):
         cluster.add_point(cur_point)
+        self.update_progress()
         for close_point in points_within_epsilon:
             if not close_point.visited:
                 close_point.update_visited(True)
@@ -66,6 +81,7 @@ class DBSCAN_Algo:
                     points_within_epsilon.extend(points_within_epsilon_to_close_point)
             if not close_point.is_member:
                 cluster.add_point(close_point)
+                self.update_progress()
 
     def get_points_within_epsilon(self, cur_point):
         points_within_epsilon = []
@@ -73,6 +89,12 @@ class DBSCAN_Algo:
             if point.distance_from(cur_point) <= self.epsilon:
                 points_within_epsilon.append(point)
         return points_within_epsilon
+
+    def update_progress(self):
+        self.points_not_alone += 1
+        cur = self.points_not_alone
+        total = len(self.data)
+        print(f'Progress: {cur} / {total} => {round(cur * 100 / total, 2)}%', end='\r')
 
 
 class Cluster:
@@ -123,6 +145,7 @@ def initialize_data(data):
 
 if __name__ == '__main__':
     # Good results:
+    # --csv-path=Test_Data_2D.csv --epsilon=2 --min-points=2
     # --csv-path=Spotify_Data_Columns_Removed_1000.csv --epsilon=1500 --min-points=15
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv-path', type=str)
@@ -133,7 +156,8 @@ if __name__ == '__main__':
     data = load_data(args.csv_path)
     initialized_data = initialize_data(data)
 
-    dbscan_obj = DBSCAN_Algo(data=initialized_data, epsilon=args.epsilon, min_points=args.min_points)
+    dbscan_obj = DBSCAN_Algo(data=initialized_data, epsilon=args.epsilon,
+                             min_points=args.min_points)
     dbscan_obj.run()
-    dbscan_obj.print_clusters()
+    dbscan_obj.print_summary()
     dbscan_obj.draw_with_matplotlib()
