@@ -63,12 +63,14 @@ class DBSCAN_Algo:
                         self.clusters.append(expanded_cluster)
 
         end_time = time.time()
-        elapsed_ms = end_time - start_time
+        elapsed_s = end_time - start_time
+        elapsed_m = elapsed_s / 60
+        elapsed_h = elapsed_m / 60
         print('\r')
         print(f'End time: {time.ctime(end_time)}')
-        print(f'Seconds elapsed: {(elapsed_ms / 1000) % 60}')
-        print(f'Minutes elapsed: {(elapsed_ms / (1000 * 60)) % 60}')
-        print(f'Hours elapsed: {(elapsed_ms / (1000 * 60 * 60)) % 60}')
+        print(f'Seconds elapsed: {elapsed_s:.{2}f}')
+        print(f'Minutes elapsed: {elapsed_m:.{2}f}')
+        print(f'Hours elapsed: {elapsed_h:.{2}f}')
 
     def expand_cluster(self, cluster, cur_point, points_within_epsilon):
         cluster.add_point(cur_point)
@@ -122,11 +124,11 @@ class Point:
 
     def distance_from(self, point):
         dimension = len(self.pos)
-        to_sqrt = []
+        accumulator = 0
         for i in range(dimension):
             delta = self.pos[i] - point.pos[i]
-            to_sqrt.append(delta ** 2)
-        return sum(to_sqrt) ** 0.5
+            accumulator += delta ** 2
+        return accumulator ** 0.5
 
     def update_visited(self, new_visited_val):
         self.visited = new_visited_val
