@@ -68,7 +68,7 @@ def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normali
     for column in columns_to_normalize:
         normalize_df(df_reorder, column)
 
-    df_reorder.to_csv('Data/normalized_' + file_name, index=False)
+    df_reorder.to_csv('Data/normalized_column_dropped_' + file_name, index=False)
 
 
 if __name__ == "__main__":
@@ -76,7 +76,11 @@ if __name__ == "__main__":
     columns_titles = ["id", "name", "artists", "year", "explicit", "mode", "acousticness", "danceability",
                       "energy", "duration_ms", "instrumentalness", "valence", "popularity", "tempo",
                       "liveness", "loudness", "speechiness", "key"]
+    columns_dropped_titles = ["year", "acousticness",
+                      "danceability",
+                      "energy", "duration_ms", "instrumentalness", "valence", "popularity", "tempo",
+                      "liveness", "loudness", "speechiness", "key"]
 
     columns_to_normalize = ['year', 'duration_ms', 'popularity', 'tempo', 'loudness', 'key']
     # Call the following function to process data:
-    # preprocess_data(file, columns_titles, columns_to_normalize)
+    preprocess_data(file, columns_dropped_titles, columns_to_normalize)
