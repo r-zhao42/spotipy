@@ -81,8 +81,8 @@ if __name__ == "__main__":
                       "energy", "duration_ms", "instrumentalness", "valence", "popularity", "tempo",
                       "liveness", "loudness", "speechiness", "key"]
 
-    columns_more_dropped_titles = ['year', 'popularity',"acousticness", "danceability", "energy", "duration_ms", "instrumentalness", "valence", "tempo","liveness", "loudness", "speechiness", "key"]
+    columns_more_dropped_titles = ['id', "acousticness", "danceability", "energy", "duration_ms", "instrumentalness", "valence", "tempo","liveness", "loudness", "speechiness", "key"]
 
     columns_to_normalize = ['duration_ms', 'tempo', 'loudness', 'key']
     # Call the following function to process data:
-    preprocess_data(file, columns_titles, columns_to_normalize, 'music_data.csv')
+    preprocess_data(file, columns_more_dropped_titles, columns_to_normalize, 'Hayks data with id.csv')
