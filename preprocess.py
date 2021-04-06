@@ -53,7 +53,7 @@ def normalize_df(df: pd.DataFrame, column_name: str):
     df[column_name] /= max_val
 
 
-def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normalize: list):
+def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normalize: list, processed_name: str):
     """Reads the .csv file stored a Data/file_name and then reorders and normalizes the
     columns according to the docstring at the top of this file. A new .csv file is generated
     named normalized_file_name in the Data folder.
@@ -68,7 +68,7 @@ def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normali
     for column in columns_to_normalize:
         normalize_df(df_reorder, column)
 
-    df_reorder.to_csv('Data/normalized_column_dropped_' + file_name, index=False)
+    df_reorder.to_csv('Data/normalized_' + processed_name, index=False)
 
 
 if __name__ == "__main__":
@@ -81,6 +81,8 @@ if __name__ == "__main__":
                       "energy", "duration_ms", "instrumentalness", "valence", "popularity", "tempo",
                       "liveness", "loudness", "speechiness", "key"]
 
-    columns_to_normalize = ['year', 'duration_ms', 'popularity', 'tempo', 'loudness', 'key']
+    columns_more_dropped_titles = ['year', 'popularity',"acousticness", "danceability", "energy", "duration_ms", "instrumentalness", "valence", "tempo","liveness", "loudness", "speechiness", "key"]
+
+    columns_to_normalize = ['duration_ms', 'tempo', 'loudness', 'key']
     # Call the following function to process data:
-    preprocess_data(file, columns_dropped_titles, columns_to_normalize)
+    preprocess_data(file, columns_titles, columns_to_normalize, 'music_data.csv')
