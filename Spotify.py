@@ -18,6 +18,10 @@ ids = set(df['id'])
 playlist_link = 'spotify:playlist:2MaKHEugScv6B9QUPIewYP'
 
 def get_track_ids(playlist_link):
+    """
+    Given the user's playlist URI, return a list of track ids included in the playlist,
+    excluding the tracks that do not exist in the dataset.
+    """
     playlist_id = playlist_link[17:]
     song_id_list = []
     playlist = sp.playlist(playlist_id)
@@ -28,7 +32,10 @@ def get_track_ids(playlist_link):
 
 
 def remove_non_existing_songs(song_id_list):
+    """
+    Given a list of track ids, return the tracks that only exist in the dataset.
+    """
     return(set(song_id_list).intersection(ids))
 
-print(get_track_ids(playlist_link))
-print(len(get_track_ids(playlist_link)))
+# print(get_track_ids(playlist_link))
+# print(len(get_track_ids(playlist_link)))
