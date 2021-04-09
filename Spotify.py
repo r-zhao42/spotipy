@@ -1,6 +1,6 @@
 """
-Taking the user inputed playlist link to generate an array of track ids using spotipy (Spotify's API) and
-discarding the tracks that do not exist in our dataset.
+Using the Spotify API
+
 """
 import pandas as pd
 import spotipy
@@ -13,29 +13,55 @@ client_credentials_manager = SpotifyClientCredentials(
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 df = pd.read_csv('data.csv')
-ids = set(df['id'])
+data_ids = set(df['id'])
+track_features = {}
 
-playlist_link = 'spotify:playlist:2MaKHEugScv6B9QUPIewYP'
+playlist_link = 'spotify:playlist:2gd9KJtjuFYVXH6zdSonxD'
 
-def get_track_ids(playlist_link):
+
+def get_total_track_ids(playlist_link):
     """
     Given the user's playlist URI, return a list of track ids included in the playlist,
     excluding the tracks that do not exist in the dataset.
     """
+    total_song_id_list = []
     playlist_id = playlist_link[17:]
-    song_id_list = []
     playlist = sp.playlist(playlist_id)
     for item in playlist['tracks']['items']:
         song_track = item['track']
-        song_id_list.append(song_track['id'])
-    return(list(remove_non_existing_songs(song_id_list)))
+        total_song_id_list.append(song_track['id'])
+    return(total_song_id_list)
 
 
-def remove_non_existing_songs(song_id_list):
+existing_track_ids = list(
+    set(get_total_track_ids(playlist_link)).intersection(data_ids))
+non_existing_track_ids = list(
+    set(get_total_track_ids(playlist_link)).difference(data_ids))
+
+
+def get_non_existing_track_features():
     """
-    Given a list of track ids, return the tracks that only exist in the dataset.
+    Return dictionary of track features, the keys represent 
+    the track ids and the values are a list for each track's feature ordered in this fashion
+    [acousticness, danceability, energy, duration_ms, instrumentalness, valence, temp, loudness, speechiness, key]
     """
-    return(set(song_id_list).intersection(ids))
+    track_ids = non_existing_track_ids
+    track_features = {key: [] for key in track_ids}
+    for track_id in track_ids:
+        features = sp.audio_features('spotify:track:' + track_id)
+        track_features[track_id].extend([features[0]['acousticness'], features[0]['danceability'], features[0]['energy'],
+                                         features[0]['duration_ms'], features[0]['instrumentalness'], features[0]['valence'], features[0]['tempo'],
+                                         features[0]['loudness'], features[0]['speechiness'], features[0]['key']])
 
-# print(get_track_ids(playlist_link))
-# print(len(get_track_ids(playlist_link)))
+    return track_features
+
+# print(get_total_track_ids(playlist_link))
+# print(len(get_total_track_ids(playlist_link)))
+
+# print(existing_track_ids)
+# print(len(existing_track_ids))
+
+# print(non_existing_track_ids)
+# print(len(non_existing_track_ids))
+
+# print(get_non_existing_track_features())
