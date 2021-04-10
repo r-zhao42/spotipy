@@ -20,12 +20,12 @@ class _SongVertex:
     """
 
     song_id: str
-    neighbours: set[_SongVertex]
+    neighbours: set[Tuple[_SongVertex, float]]
 
-    def __init__(self, song_id: str, neighbours: set[_SongVertex]) -> None:
+    def __init__(self, song_id: str, neighbours: set[Tuple[_SongVertex, float]]) -> None:
         """Initialize a new vertex with the given item and neighbours."""
         self.song_id = song_id
-        self.neighbours = set(Tuple[_SongVertex, float])
+        self.neighbours = neighbours
 
     # Any more methods for this class????
 
@@ -49,7 +49,7 @@ class SongGraph:
     #
 
     vertices: Dict[str, _SongVertex]
-    _clusters: Dict[str, str]
+    _clusters: Dict[str, List[str]]
 
     def __init__(self) -> None:
         """Initialize an empty SongGraph ."""

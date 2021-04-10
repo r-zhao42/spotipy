@@ -31,7 +31,7 @@ class PlaylistEntry:
 
         self.link_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
-        self.slider = tk.Scale(self.root, from_=0, to=10, tickinterval=1, orient='vertical',
+        self.slider = tk.Scale(self.root, from_=0, to=10, tickinterval=1, orient='horizontal',
                                bg="#1DB954",
                                fg="BLACK", sliderlength=20, length=200)
 
