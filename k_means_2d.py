@@ -1,7 +1,9 @@
 from __future__ import annotations
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import random
 import csv
+import time
+
 
 class K_MEANS_Algo:
     """Class for k-means algorithm"""
@@ -10,22 +12,22 @@ class K_MEANS_Algo:
     centroids: list
     clusters: dict
 
-
     def __init__(self, data, k: int):
         self.data = data
         self.centroids = [random.choice(data) for _ in range(k)]
         self.clusters = self.update_clusters()
+        self.graph()
 
     def run_n_times(self, n: int):
         for _ in range(n):
             self.run_once()
+            time.sleep(2)
 
     def run_once(self):
         self.centroids = self.find_new_centroids(self.clusters)
         self.clusters = self.update_clusters()
         self.print_cluster_len()
-        print()
-
+        self.graph()
 
     def update_clusters(self) -> dict:
         clusters = dict((key, []) for key in self.centroids)
@@ -70,6 +72,35 @@ class K_MEANS_Algo:
         for cluster in self.clusters:
             print(len(self.clusters[cluster]))
 
+    def graph(self):
+        points = []
+
+        for cluster in self.clusters:
+            points.extend(self.clusters[cluster])
+
+        x = [point.pos[0] for point in points]
+        y = [point.pos[1] for point in points]
+
+        for point in self.centroids:
+            x.append(point.pos[0])
+            y.append(point.pos[1])
+
+        colors = []
+        colors_choices = ['navy', 'green', 'yellow', 'red', 'purple', 'pink', 'brown', 'black']
+
+        c_i = 0
+        for cluster in self.clusters:
+            for _ in self.clusters[cluster]:
+                colors.append(colors_choices[c_i])
+            c_i += 1
+        for _ in range(len(self.centroids)):
+            colors.append('black')
+
+        plt.scatter(x, y, c=colors)
+        plt.show()
+
+
+
 
 
 class Point:
@@ -85,6 +116,7 @@ class Point:
             delta = self.pos[i] - point.pos[i]
             accumulator += delta ** 2
         return accumulator ** 0.5
+
 
 class Clusters:
     def __init__(self, points):
@@ -104,15 +136,15 @@ def load_path(path: str):
     next(file)
     return [[float(val) for val in line] for line in file]
 
+
 def initialize_data(data: list):
     return [Point(line) for line in data]
 
+
 if __name__ == "__main__":
-    raw_data = load_path("Data/test_data_sample.csv")
+    raw_data = load_path("Data/more_test_data_2d.csv")
     data = initialize_data(raw_data)
 
-    k_means = K_MEANS_Algo(data, 4)
-
-
+    k_means = K_MEANS_Algo(data, 6)
 
 
