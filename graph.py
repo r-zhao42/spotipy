@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Optional
 
 
 class _SongVertex:
@@ -14,23 +14,46 @@ class _SongVertex:
         is the distance value of the edge that is derived from how "similar" each vertex in
         neighbours is compared to self.
 
+
+    Private Instance Attributes:
+        - attribute_list: is a list of all the songs attributes with uniform format, for example:
+
+                Index           Attribute Type
+                0                  'acousticeness'
+                1                  'danceability'
+                2                   energy
+                3                   duration_ms
+                4                   instrument
+                5                   valence
+                6                   tempo
+                7                   'liveness'
+                8                   loudness
+                9                   'speechness'
+                10                  'key'
+
+
     Representation Invariants:
         - self not in self.neighbours
         - all(self in u.neighbours for u in self.neighbours)
     """
 
     song_id: str
-    neighbours: set[Tuple[_SongVertex, float]]
+    neighbours: Optional[set[Tuple[_SongVertex, float]]]
 
-    def __init__(self, song_id: str, neighbours: set[Tuple[_SongVertex, float]]) -> None:
+    _attribute_list: List[float]
+
+    # Decide on whether this needs to be private or not
+    cluster: Optional[str]
+
+    def __init__(self, song_id: str, neighbours: set[Tuple[_SongVertex, float]], cluster: str,
+                 _attribute_list: List[str]) -> None:
         """Initialize a new vertex with the given item and neighbours."""
         self.song_id = song_id
         self.neighbours = neighbours
+        self.cluster = cluster
 
-    # Any more methods for this class????
+        self._attribute_list = attribute_list
 
-    def get_vibe(self) -> str:
-        """Returns the vibe of the song, in other words, it returns what cluster the song is in"""
 
 
 class SongGraph:
@@ -45,11 +68,11 @@ class SongGraph:
     # Private Instance Attributes:
     #     - _clusters:
     #         This is a dictionary that stores the clusters of the database, derived from K-means
-    #         clustering, and the values are the songs that are in that cluster
+    #         clustering, and the values are the list of songs that are in that specific cluster
     #
 
     vertices: Dict[str, _SongVertex]
-    _clusters: Dict[str, List[str]]
+    clusters: Dict[str, List[str]]
 
     def __init__(self) -> None:
         """Initialize an empty SongGraph ."""
@@ -101,7 +124,7 @@ class SongGraph:
             return False
 
 
-def add_new_songs(new_songs: Dict[str, List[str]], graph: SongGraph ) -> SongGraph:
+def add_new_songs(new_songs: Dict[str, List[float]], graph: SongGraph) -> SongGraph:
     """Adds the new songs that are not in our database
 
     The dictionary of songs are *new* songs that are not in our database, but we will add them
@@ -112,19 +135,84 @@ def add_new_songs(new_songs: Dict[str, List[str]], graph: SongGraph ) -> SongGra
 
     """
 
+    # First iterate through every new song
     for song in new_songs:
+
+        # Add the new vertex into our graph
+        graph.add_vertex(song)
+
+        nearest = []
+        # Find the three nearest neighbours of this song
         for vertex in graph.vertices:
+            list_of_attributes = new_songs[song]
 
-            old_vertex = graph.vertices[vertex]
+            # Implemement this
+            normalize(list_of_attributes)
 
-            # Add vertex to our graph
-            graph.add_vertex(song)
+            distance = vertex.get_distance(song)
 
-            distance = old_vertex.calculate_distance()
-            graph
+            # Append the tuple(distance to current song, vertex in the graph)
+            nearest.append((distance, vertex))
 
+        # Sort nearest and get the 3 closest ones
+        sorted_nearest = nearest.sorted(reverse=True)[:3]
 
+        # Add edges from this song, to the three nearest vertices in our graph
+        for i in range(len(sorted_nearest)):
+            graph.add_edge(song, sorted_nearest[i][1])
+
+        # Check if all have different clusters or not!
+        is_all_different = all([sorted_nearest[i][0] != sorted_nearest[i + 1][0]
+                                for i in range(len(sorted_nearest) - 1)])
+
+        if is_all_different:
+            # Here we would pick the cluster of the closest vertex
+
+            target_cluster = sorted_nearest[0][0]
+
+            # We add the *new song* to this cluster
+            graph.clusters[target_cluster].append(song)
+
+        else:   # In this case there would be a majority
+
+            majority_cluster = _majority_cluster(sorted_nearest)
+
+            # We add the *new song* to this majority cluster
+            graph.clusters[majority_cluster].append(song)
+
+    # We return the mutated graph
     return graph
+
+
+def _majority_cluster(sorted_nearest: List[Tuple[float, str]]) -> str:
+    """Helper function that returns the cluster that occurs the most in the list of nearest clusters
+
+
+    >>> lst = [(3.59, 'a'), (4.78, 'a'), (6.89, 'b')]
+    >>> _majority_cluster(lst)
+    'a'
+
+    """
+
+    occurrence_dict = {}
+
+    # Setup the dictionary
+    for tup in sorted_nearest:
+        occurrence_dict[tup[1]] = 0
+
+    for tup in sorted_nearest:
+        occurrence_dict[tup[1]] += 1
+
+    return max(occurrence_dict, key=occurrence_dict.get)
+
+
+def normalize(attributes: list[floats]) -> list[float]:
+    """This function returns the normalized list of song attributes"""
+
+
+# MAKE THIS A GRAPH METHOD
+def distance(normalized_attributes: list[floats], vertex: _SongVertex) -> float:
+    """Returns the distance of v_1 and v_2"""
 
 
 def recommend_songs(graph: SongGraph, length: int, user_songs: list[str]) -> list[str]:
@@ -136,8 +224,14 @@ def recommend_songs(graph: SongGraph, length: int, user_songs: list[str]) -> lis
     # Iterate through the vertices in the graph
     for vertex in graph.vertices:
 
+        pass
 
-    return song_to_recommend
+    return lst
+    # return song_to_recommend
 
 
+if __name__ == '__main__':
+
+    import doctest
+    doctest.testmod()
 

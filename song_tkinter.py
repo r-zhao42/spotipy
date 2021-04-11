@@ -31,7 +31,7 @@ class PlaylistEntry:
 
         self.link_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
-        self.slider = tk.Scale(self.root, from_=0, to=10, tickinterval=1, orient='horizontal',
+        self.slider = tk.Scale(self.root, from_=1, to=10, tickinterval=1, orient='horizontal',
                                bg="#1DB954",
                                fg="BLACK", sliderlength=20, length=200)
 
@@ -91,15 +91,35 @@ class PlaylistEntry:
         # Here we update the desired new playlist
         self.playlist_length_entry = self.length_entry.get()
 
+        if int(self.playlist_length_entry) > 100:
+            print('Enter a number between 0 - 100')
+
         # We need to quit out of the window when the user has inputted all of the entries.
         if self.playlist_entry != '' and self.scale_entry != '' \
-                and self.playlist_length_entry != '':
+                and int(self.playlist_length_entry) <= 100:
+            # Since now we know all inputs are recorded, we can automatically quit the window
+
 
             self.root.destroy()
+            print('YOUR INFORMATION HAS BEEN RECORDED.')
+            print('THANK YOU!')
 
-        print(self.playlist_entry)
-        print(self.scale_entry)
-        print(self.playlist_length_entry)
+        # print(self.playlist_entry)
+        # print(self.scale_entry)
+        # print(self.playlist_length_entry)
+
+    def quit_window(self) -> None:
+        """Responsible for quitting out of the window
+
+        Preconditions:
+            - isinstance(self.playlist_entry, str) is True
+            - isinstance(self.scale_entry, str) is True
+            - isinstance(int(self.playlist_length_entry), int) is True
+
+        """
+
+
+
 
 
 if __name__ == "__main__":
