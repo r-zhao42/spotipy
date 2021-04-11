@@ -9,14 +9,14 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 
 client_credentials_manager = SpotifyClientCredentials(
-    '6af4f7c48ecd43258dc10f18315e58ca', 'bf479de0603a41efb016107ce8148928')
+    'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 df = pd.read_csv('data.csv')
 data_ids = set(df['id'])
 track_features = {}
 
-playlist_link = 'spotify:playlist:2gd9KJtjuFYVXH6zdSonxD'
+playlist_link = 'spotify:playlist:0FDxO6gIjwSw2rGJjfIS0Q'
 
 
 def get_total_track_ids(playlist_link):
@@ -64,4 +64,5 @@ def get_non_existing_track_features():
 # print(non_existing_track_ids)
 # print(len(non_existing_track_ids))
 
-# print(get_non_existing_track_features())
+print(get_non_existing_track_features())
+print(type(sp))
