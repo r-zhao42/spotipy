@@ -1,19 +1,10 @@
 class Track:
+    """
+    A Track object represents a single song.
+    """
 
-
-    """Track represents a piece of music."""
-    
-    
-    def __init__(self, name, id, artist):
-        """
-        :param name (str): Track name
-        :param id (str): Spotify track id
-        :param artist (str): Artist who created the track
-        """
-        self.name = name
+    def __init__(self, id):
         self.id = id
-    
-    
-    def create_spotify_uri(self):
-        return f"spotify:track:{self.id}"
 
+    def create_track_uri(self):
+        return "spotify:track:" + self.id

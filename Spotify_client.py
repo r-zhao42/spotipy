@@ -1,9 +1,8 @@
 import json
-from Track import Track
-from Playlist import Playlist
+from track import Track
+from playlist import Playlist
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-
 import requests
 
 
@@ -18,6 +17,7 @@ class SpotifyClient:
         """
         self._authorization_token = authorization_token
         self._user_id = user_id
+        self._url = ''
 
 
     def create_playlist(self, name):
@@ -45,13 +45,13 @@ class SpotifyClient:
         :param tracks (list of Track): Tracks to be added to playlist
         :return response: API response
         """
-        track_uris = [track.create_spotify_uri() for track in tracks]
+        track_uris = [track.create_track_uri() for track in tracks]
         data = json.dumps(track_uris)
         url = f"https://api.spotify.com/v1/playlists/{playlist.id}/tracks"
         response = self._place_post_api_request(url, data)
         response_json = response.json()
-        client_url = f'https://open.spotify.com/playlist/{playlist.id}'
-        print(client_url)
+        self._url = f'https://open.spotify.com/playlist/{playlist.id}'
+        print(self._url)
         return response_json
 
     def _place_get_api_request(self, url):
@@ -74,11 +74,10 @@ class SpotifyClient:
             }
     )
         return response
-client_credentials_manager = SpotifyClientCredentials(
-    'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-test_tracks = [Track('Killamonjaro', '537l7spEsGg6aWl6Y9eKAs', 'KILLY'), Track('Killamonjaro', '537l7spEsGg6aWl6Y9eKAs', 'KILLY')]
-client = SpotifyClient(sp)
+
+
+test_tracks = [Track('537l7spEsGg6aWl6Y9eKAs'), Track('537l7spEsGg6aWl6Y9eKAs')]
+client = SpotifyClient('BQCc0fzzNOmtDH1WyelW-1ZWupJzJnIrrobXhLY-iyF31zd6bEF3QBoYdqIC3HLBQda_uhs9ATDZKSzFIbUj_F-2plU4FFus3K7Y7LswTqcMwzvx2WmFG4YWx_rtDACUxyN0WIJKVsTGZlKaA8jhlpQpApkqYzcHfYb4sZHizKT0P6iso-ZaYXZHqKagELZCWSWky1nWuxcg9nGHL2nCZn5An7HZsJFWRqs6zm8PWdhp20uu6Un3vxyA74hDVZ6VkwLDNIVjDSKvzwm2pq7xQ5T_Yp7bocjn8qPFXb3O', 	'i2fc15uzt49drjhsp3fjcqqdw')
 client.populate_playlist(client.create_playlist('fun'), test_tracks)
 
 
