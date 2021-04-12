@@ -159,7 +159,7 @@ def initialize_data(data: List[List]) -> List[Point]:
 
 
 if __name__ == "__main__":
-    raw_data = load_path("Data/sample_with_id.csv")
+    raw_data = load_path("Data/Hayk's dropped data.csv")
     data = initialize_data(raw_data)
 
-    k_means = KMeansAlgo(data, 4)
+    k_means = KMeansAlgo(data, 200)
