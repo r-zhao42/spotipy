@@ -15,24 +15,18 @@ Specifically, from left to right, the columns will be organized as follows:
 
 Categorical
     1. id
-    2. name
-    3. artist
-    4. year
-    5. explicit
-    6. mode
 Numerical/Music
-    6. acousticness (Ranges from 0 to 1)
-    7. danceability (Ranges from 0 to 1)
-    8. energy (Ranges from 0 to 1)
-    9. duration_ms (Integer typically ranging from 200k to 300k)
-    10. instrumentalness (Ranges from 0 to 1)
-    11. valence (Ranges from 0 to 1)
-    12. popularity (Ranges from 0 to 100)
-    13. tempo (Float typically ranging from 50 to 150)
-    14. liveness (Ranges from 0 to 1)
-    15. loudness (Float typically ranging from -60 to 0)
-    16. speechiness (Ranges from 0 to 1)
-    17. key
+    2. acousticness (Ranges from 0 to 1)
+    3. danceability (Ranges from 0 to 1)
+    4. energy (Ranges from 0 to 1)
+    5. duration_ms (Integer typically ranging from 200k to 300k)
+    6. instrumentalness (Ranges from 0 to 1)
+    7. valence (Ranges from 0 to 1)
+    8. tempo (Float typically ranging from 50 to 150)
+    9. liveness (Ranges from 0 to 1)
+    10. loudness (Float typically ranging from -60 to 0)
+    11. speechiness (Ranges from 0 to 1)
+    12. key
 """
 import pandas as pd
 
