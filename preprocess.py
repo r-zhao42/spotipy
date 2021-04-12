@@ -36,6 +36,42 @@ Numerical/Music
 """
 import pandas as pd
 
+
+class Data:
+    """A class to store the data with function mainly to normalize new song data"""
+    data: pd.DataFrame
+
+    def __init__(self):
+        """Initializes a object that stores the music data as a pandas dataframe. Contains
+        function to normalize any new data based on data in our dataset."""
+        self.data = pd.read_csv('Data/music_data.csv')
+
+    def normalize_value(self, pos: list) -> list:
+        """Normalizes a list of values based on the data in our dataset.
+
+        Preconditions:
+            - pos is a list of floats that is ordered so that each element represents the following:
+                [acousticness, danceability, energy, duration_ms, instrumentalness, valence, temp,
+                loudness, speechiness, key]
+        """
+        duration = pos[3]
+        tempo = pos[6]
+        loudness = pos[7]
+        key = pos[9]
+
+        normalized_duration = (duration - self.data['duration_ms'].min()) / \
+                              (self.data['duration_ms'].max() - self.data['duration_ms'].min())
+        normalized_tempo = (tempo - self.data['tempo'].min()) / \
+                              (self.data['tempo'].max() - self.data['tempo'].min())
+        normalized_loudness = (loudness - self.data['loudness'].min()) / \
+                              (self.data['loudness'].max() - self.data['loudness'].min())
+        normalized_key = (key - self.data['key'].min()) / \
+                              (self.data['key'].max() - self.data['key'].min())
+
+        return pos[:3] + [normalized_duration] + pos[4:6] + \
+               [normalized_tempo, normalized_loudness] + [pos[8]] + [normalized_key]
+
+
 def normalize_df(df: pd.DataFrame, column_name: str):
     """Normalizes every value in the specified column in the dataframe.
 
@@ -53,7 +89,7 @@ def normalize_df(df: pd.DataFrame, column_name: str):
     df[column_name] /= max_val
 
 
-def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normalize: list, processed_name: str):
+def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normalize: list, processed_name: str, new_file: bool = False):
     """Reads the .csv file stored a Data/file_name and then reorders and normalizes the
     columns according to the docstring at the top of this file. A new .csv file is generated
     named normalized_file_name in the Data folder.
@@ -67,8 +103,9 @@ def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normali
     df_reorder = music_df.reindex(columns=columns_to_reorder)
     for column in columns_to_normalize:
         normalize_df(df_reorder, column)
-
-    df_reorder.to_csv('Data/normalized_' + processed_name, index=False)
+    if new_file:
+        df_reorder.to_csv('Data/normalized_' + processed_name, index=False)
+    return df_reorder
 
 
 if __name__ == "__main__":
@@ -85,4 +122,4 @@ if __name__ == "__main__":
 
     columns_to_normalize = ['duration_ms', 'tempo', 'loudness', 'key']
     # Call the following function to process data:
-    preprocess_data(file, columns_more_dropped_titles, columns_to_normalize, 'Hayks data with id.csv')
+    # preprocess_data(file, columns_more_dropped_titles, columns_to_normalize, 'music_data.csv', True)
