@@ -1,4 +1,8 @@
-"""A module containing the classes needed to perform the k-means clustering algorithm"""
+"""A module containing the classes needed to perform the k-means clustering algorithm
+
+For our project, to use this module, a KMeansAlgo object should be initialized with the
+path 'Data/normalized_data_final.csv' and k of 200
+"""
 
 from __future__ import annotations
 from typing import Optional, List, Union
@@ -22,12 +26,12 @@ class KMeansAlgo:
     centroids: list
     clusters: dict
 
-    def __init__(self, data: list, k: int):
+    def __init__(self, path: str, k: int):
         """Initializes the k_means object with k number of centroids that are picked randomly
         from the data points. The initialization also does the first round of clustering based
         on those centroids."""
-        self.data = data
-        self.centroids = [random.choice(data) for _ in range(k)]
+        self.data = initialize_data(load_path(path))
+        self.centroids = [random.choice(self.data) for _ in range(k)]
         self.clusters = self.update_clusters()
 
     def run_n_times(self, n: int) -> None:
@@ -50,7 +54,7 @@ class KMeansAlgo:
         is closest to. Returns a dictionary mapping each centroid to a list of points which
         represents the clusters."""
         clusters = dict((key, []) for key in self.centroids)
-        for i in range(len(data)):
+        for i in range(len(self.data)):
             point = self.data[i]
             closest_center = self.centroids[0]
             min_distances = point.distance_from(closest_center)
@@ -134,7 +138,14 @@ class Point:
 def load_path(path: str) -> List[List]:
     """Loads the .csv file at path. This function assumes that the first column represents the id
     of the song and the rest of the columns represent the position values. The function
-    returns a list of lists, where each inner list is a row in the .csv file."""
+    returns a list of lists, where each inner list is a row in the .csv file.
+
+    Preconditions:
+        - The .csv file stored at path must be formatted such that the columns are ordered in the
+        following way from left to right
+            [acousticness, danceability, energy, duration_ms, instrumentalness, valence, tempo,
+            loudness, speechiness, key]
+    """
     file = csv.reader(open(path))
     next(file)
     accumulator = []
@@ -159,7 +170,7 @@ def initialize_data(data: List[List]) -> List[Point]:
 
 
 if __name__ == "__main__":
-    raw_data = load_path("Data/Hayk's dropped data.csv")
-    data = initialize_data(raw_data)
+    # raw_data = load_path("Data/normalized_Hayks data with id.csv")
+    # data = initialize_data(raw_data)
 
-    k_means = KMeansAlgo(data, 200)
+    k_means = KMeansAlgo("Data/normalized_data_final.csv", 4)
