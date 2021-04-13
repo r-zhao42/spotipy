@@ -56,7 +56,7 @@ def get_non_existing_track_features():
     """
     Return dictionary of track features, the keys represent 
     the track ids and the values are a list for each track's feature ordered in this fashion
-    [acousticness, danceability, energy, duration_ms, instrumentalness, valence, temp, liveliness, loudness, speechiness, key]
+    [acousticness, danceability, energy, duration_ms, instrumentalness, valence, tempo, liveliness, loudness, speechiness, key]
     """
     track_ids = get_non_existing_track_ids()
     track_features = {key: [] for key in track_ids}
