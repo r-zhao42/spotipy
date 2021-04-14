@@ -269,16 +269,16 @@ def generate_random_points(dimension, num):
     return [Point([random.uniform(-10.0, 10.0) for j in range(dimension)], generate_id()) for i in range(num)]
 
 
-k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 10)
-k_means.run_n_times(1)
-clusters = k_means.get_clusters()
-clusters = list(clusters.values())
+pickle_file = open(f'Cluster_Final.pickle', 'rb')
+centroid_to_clusters = pickle.load(file=pickle_file)
+clusters = list(centroid_to_clusters.values())
 smallest_cluster = None
 for cluster in clusters:
     if smallest_cluster == None or len(cluster) < len(smallest_cluster):
         smallest_cluster = cluster
 c = smallest_cluster
 # c = generate_random_points(3, 100)
+
 
 g = Graph(points=c, epsilon=0.25)
 g.init_edges()
@@ -290,14 +290,14 @@ input_songs = [song.id for song in c[:10]]
 recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
 print('Recommendations:', recommendations)
 print('Fails:', fails)
-
+#
 input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
 assert not input_in_recommendation
 
 # Test unpickling
 g_copy = Graph()
 g_copy.restore_from_state(file_name='Cluster_State')
-
+#
 points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
 assert points_restored
 epsilon_restored = g.epsilon == g_copy.epsilon

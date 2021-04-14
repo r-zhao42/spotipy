@@ -38,7 +38,7 @@ class Data:
     def __init__(self):
         """Initializes a object that stores the music data as a pandas dataframe. Contains
         function to normalize any new data based on data in our dataset."""
-        self.data = pd.read_csv('Preprocess Data/music_data.csv')
+        self.data = pd.read_csv('Data/music_data.csv')
 
     def normalize_value(self, pos: list) -> list:
         """Normalizes a list of values based on the data in our dataset.
@@ -92,13 +92,13 @@ def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normali
         - file_name is a .csv file in the Data folder
         - file_name is formatted as specified on the database website at top of file
     """
-    file_path = 'Preprocess Data/'+file_name
+    file_path = 'Data/'+file_name
     music_df = pd.read_csv(file_path)
     df_reorder = music_df.reindex(columns=columns_to_reorder)
     for column in columns_to_normalize:
         normalize_df(df_reorder, column)
     if new_file:
-        df_reorder.to_csv('Preprocess Data/normalized_' + processed_name, index=False)
+        df_reorder.to_csv('Data/normalized_' + processed_name, index=False)
     return df_reorder
 
 
