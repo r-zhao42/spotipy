@@ -1,2 +1,4 @@
 temp_venv
 test.py
+.DS_Store
+.idea
