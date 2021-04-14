@@ -127,10 +127,6 @@ class Graph:
             else:
                 # Handle song not in graph
                 pos = self.get_new_song_pos()
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                # METHOD NOT IMPLEMENTED YET. NEED TO WORK WITH SPOTIFY AND PREPROCESS BRANCHES!
-                # THIS FUNCTION NEEDS TO BLOCK RUNTIME!
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 new_song = Point(pos, input_song_id)
                 self.init_new_point(new_song)
 
