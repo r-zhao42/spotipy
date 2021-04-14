@@ -3,10 +3,15 @@ from collections import deque
 import pickle
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import spotipy
 from Point import Point
 from preprocess import Data
+from Spotify.song_features import get_features
 
 DATA = Data()
+CLIENT_CREDENTIALS_MANAGER = spotipy.oauth2.SpotifyClientCredentials(
+    'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
+SPOTIPY = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 class Graph:
@@ -185,7 +190,7 @@ class Graph:
         return {'success': False}
 
     def get_new_song_pos(self, song_id: str):
-        spotify_pos = spotify(id)
+        spotify_pos = get_features(song_id, SPOTIPY)
         normalized_pos = DATA.normalize_value(spotify_pos)
         return normalized_pos
 
