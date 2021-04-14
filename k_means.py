@@ -1,7 +1,7 @@
 """A module containing the classes needed to perform the k-means clustering algorithm
 
 For our project, to use this module, a KMeansAlgo object should be initialized with the
-path 'Data/normalized_data_final.csv' and k of 200
+path 'Kmeans Data/normalized_data_final.csv' and k of 150
 """
 
 from __future__ import annotations
@@ -173,4 +173,4 @@ if __name__ == "__main__":
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
 
-    k_means = KMeansAlgo("Data/normalized_data_final.csv", 150)
+    #k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 150)

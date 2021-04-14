@@ -142,9 +142,9 @@ def initialize_data(data: list):
 
 
 if __name__ == "__main__":
-    raw_data = load_path("Data/test_data_full_2d.csv")
+    raw_data = load_path("Kmeans Data/test_data_full_2d.csv")
     data = initialize_data(raw_data)
 
-    k_means = K_MEANS_Algo(data, )
+    k_means = K_MEANS_Algo(data, 4)
 
 
