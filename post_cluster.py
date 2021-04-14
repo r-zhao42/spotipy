@@ -221,36 +221,36 @@ def generate_random_points(dimension, num):
 
 
 # To be substituted by real cluster data from kmeans branch:
-k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 10)
+k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 100)
 k_means.run_n_times(1)
-clusters = k_means.get_clusters()
-c = list(clusters.values())[0]
+# clusters = k_means.get_clusters()
+# c = list(clusters.values())[0]
 # c = generate_random_points(11, 1500)
 
-g = Graph(points=c, epsilon=0.25)
-g.init_edges()
+# g = Graph(points=c, epsilon=0.25)
+# g.init_edges()
 # g.draw_with_matplotlib()
 
-g.save_state(file_name='Cluster_State')
-
-input_songs = [song.id for song in c[:10]]
-recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
-print('Recommendations:', recommendations)
-print('Fails:', fails)
-
-input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
-assert not input_in_recommendation
+# g.save_state(file_name='Cluster_State')
+#
+# input_songs = [song.id for song in c[:10]]
+# recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
+# print('Recommendations:', recommendations)
+# print('Fails:', fails)
+#
+# input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
+# assert not input_in_recommendation
 
 # Test unpickling
-g_copy = Graph()
-g_copy.restore_from_state(file_name='Cluster_State')
-
-points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
-assert points_restored
-epsilon_restored = g.epsilon == g_copy.epsilon
-assert epsilon_restored
-id_point_mapping_restored = all(str(g.id_point_mapping[song_id]) == str(
-    g_copy.id_point_mapping[song_id]) for song_id in g.id_point_mapping)
-assert id_point_mapping_restored
-song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
-assert song_ids_restored
+# g_copy = Graph()
+# g_copy.restore_from_state(file_name='Cluster_State')
+#
+# points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
+# assert points_restored
+# epsilon_restored = g.epsilon == g_copy.epsilon
+# assert epsilon_restored
+# id_point_mapping_restored = all(str(g.id_point_mapping[song_id]) == str(
+#     g_copy.id_point_mapping[song_id]) for song_id in g.id_point_mapping)
+# assert id_point_mapping_restored
+# song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
+# assert song_ids_restored

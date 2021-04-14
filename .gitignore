@@ -4,3 +4,4 @@ test.py
 .idea
 __pycache__
 *.pickle
+!Cluster_Final.pickle.pickle
