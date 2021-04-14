@@ -6,6 +6,8 @@ path 'Kmeans Data/normalized_data_final.csv' and k of 150
 
 from __future__ import annotations
 from typing import Optional, List, Union
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from Point import Point
 import random
 import csv
@@ -113,6 +115,104 @@ class KMeansAlgo:
         list is a cluster."""
         return self.clusters
 
+    def graph_3d(self, x: str, y: str, z: str):
+        """
+        Graph the clusters in 3 dimensions based on the attributes given for x, y, and z
+
+        Preconditions:
+             - x in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            tempo, liveness, loudness, speechiness, key}
+            - y in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            tempo, liveness, loudness, speechiness, key}
+            - z in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            tempo, liveness, loudness, speechiness, key}
+        """
+        attribute_to_index = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
+                              'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
+                              'loudness': 8, 'speechiness': 10, 'key': 11}
+
+        x_index = attribute_to_index[x]
+        y_index = attribute_to_index[y]
+        z_index = attribute_to_index[z]
+        points = []
+
+        for cluster in self.clusters:
+            points.extend(self.clusters[cluster])
+
+        x = [point.pos[x_index] for point in points]
+        y = [point.pos[y_index] for point in points]
+        z = [point.pos[z_index] for point in points]
+
+        for point in self.centroids:
+            x.append(point.pos[x_index])
+            y.append(point.pos[y_index])
+            z.append(point.pos[z_index])
+
+        colors = []
+        colors_choices = list(plt.cm.colors.cnames)
+
+        c_i = 0
+        for cluster in self.clusters:
+            for _ in self.clusters[cluster]:
+                colors.append(colors_choices[c_i])
+            c_i += 1
+            if c_i >= len(colors_choices):
+                c_i = 0
+        for _ in range(len(self.centroids)):
+            colors.append('black')
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.scatter(xs=x, ys=y, zs=z, color=colors)
+        plt.show()
+
+    def graph_2d(self, x: str, y: str):
+        """
+        Graph the clusters in 2 dimensions based on the attributes given for x and y
+
+        Preconditions:
+            - x in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            tempo, liveness, loudness, speechiness, key}
+            - y in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            tempo, liveness, loudness, speechiness, key}
+        """
+        attribute_to_index = {'acousticness' : 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
+                              'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
+                              'loudness': 8, 'speechiness': 10, 'key': 11}
+
+        x_index = attribute_to_index[x]
+        y_index = attribute_to_index[y]
+
+        points = []
+
+        for cluster in self.clusters:
+            points.extend(self.clusters[cluster])
+
+        x = [point.pos[x_index] for point in points]
+        y = [point.pos[y_index] for point in points]
+
+        for point in self.centroids:
+            x.append(point.pos[x_index])
+            y.append(point.pos[y_index])
+
+        colors = []
+        colors_choices = list(plt.cm.colors.cnames)
+
+        c_i = 0
+        for cluster in self.clusters:
+            for _ in self.clusters[cluster]:
+                colors.append(colors_choices[c_i])
+            c_i += 1
+            if c_i >= len(colors_choices):
+                c_i = 0
+
+        for _ in range(len(self.centroids)):
+            colors.append('black')
+
+        plt.scatter(x, y, c=colors)
+        plt.show()
+
+
 
 def load_path(path: str) -> List[List]:
     """Loads the .csv file at path. This function assumes that the first column represents the id
@@ -148,8 +248,36 @@ def initialize_data(data: List[List]) -> List[Point]:
     return [Point(line[1:], line[0]) for line in data]
 
 
-if __name__ == "__main__":
+# def project_point(pos: list) -> list:
+#     """Take a point in 11 dimension and projects it into 3 dimensions
+#
+#     Specifically, we want to project a 11 dimensional vector onto the volume
+#     [x, y, z, 0, 0, 0, 0, 0, 0, 0, 0]
+#
+#     The equation for a projection is
+#         proj_v (u) = ((u * v)/ ||v||^2) * v
+#
+#     In our case, pos is u and [x, y, z, 0, 0, 0, 0, 0, 0, 0, 0] is v
+#     """
+#     return []
+# def reduce_dimension(pos: list) -> list:
+#     t = 1 / pos[-1]
+#     return [pos[i] * t for i in range(len(pos) - 1)]
+#
+# def project_3d(pos: list) -> list:
+#     result = pos
+#     for _ in range(8):
+#         result = reduce_dimension(pos)
+#     return result
+#
+# def project_2d(pos: list) -> list:
+#     result = pos
+#     for _ in range(9):
+#         result = reduce_dimension(pos)
+#     return result
 
+
+if __name__ == "__main__":
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
-    # k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 4)
+    k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 20)
