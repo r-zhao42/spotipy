@@ -100,13 +100,17 @@ class KMeansAlgo:
         for cluster in self.clusters:
             print(len(self.clusters[cluster]))
 
-    def get_clusters(self) -> List[List[Point]]:
+    # def get_clusters(self) -> List[List[Point]]:
+    #     """Returns the clusters stored in the object as a list of lists where each inner
+    #     list is a cluster."""
+    #     accumulator = []
+    #     for cluster in self.clusters:
+    #         accumulator.append(self.clusters[cluster])
+    #     return accumulator
+    def get_clusters(self) -> dict:
         """Returns the clusters stored in the object as a list of lists where each inner
         list is a cluster."""
-        accumulator = []
-        for cluster in self.clusters:
-            accumulator.append(self.clusters[cluster])
-        return accumulator
+        return self.clusters
 
 
 class Point:
@@ -170,6 +174,7 @@ def initialize_data(data: List[List]) -> List[Point]:
 
 
 if __name__ == "__main__":
+
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
 
