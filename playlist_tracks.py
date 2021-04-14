@@ -73,3 +73,4 @@ def get_non_existing_track_ids() -> list:
 # print(get_existing_track_ids())
 # print(get_non_existing_track_ids())
 # print(get_non_existing_track_features())
+print(get_total_track_ids('https://open.spotify.com/playlist/6ktWPSpBFHFDvCIyg8tjNe'))
