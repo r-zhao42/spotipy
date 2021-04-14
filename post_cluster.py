@@ -1,6 +1,7 @@
 import random
 from collections import deque
 import pickle
+# import sys
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import spotipy
@@ -8,6 +9,9 @@ from Point import Point
 from preprocess import Data
 from Spotify.song_features import get_features
 from k_means import KMeansAlgo
+
+# Fallback if pickling to / unpickling from custom Graph_Save object doesn't work
+# sys.setrecursionlimit(100000)
 
 DATA = Data()
 CLIENT_CREDENTIALS_MANAGER = spotipy.oauth2.SpotifyClientCredentials(
@@ -58,17 +62,27 @@ class Graph:
 
     def save_state(self, file_name):
         pickle_file = open(f'{file_name}.pickle', 'wb')
-        pickle.dump(obj=self, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
+        to_save = Graph_Save()
+        to_save.save(self)
+        pickle.dump(obj=to_save, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
+        # Fallback:
+        # pickle.dump(obj=self, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
         pickle_file.close()
 
     def restore_from_state(self, file_name):
         pickle_file = open(f'{file_name}.pickle', 'rb')
-        restored_graph = pickle.load(file=pickle_file)
+        restored = pickle.load(file=pickle_file)
+        restored_graph = restored.restore()
+        # Fallback:
+        # restored_graph = pickle.load(file=pickle_file)
         pickle_file.close()
         self.points = restored_graph.points
         self.epsilon = restored_graph.epsilon
-        self.id_point_mapping = restored_graph.id_point_mapping
-        self.song_ids = restored_graph.song_ids
+        self.id_point_mapping = {point.id: point for point in self.points}
+        self.song_ids = list(self.id_point_mapping.keys())
+        # Fallback:
+        # self.id_point_mapping = restored_graph.id_point_mapping
+        # self.song_ids = restored_graph.song_ids
 
     def init_edges(self):
         noise = []
@@ -212,6 +226,41 @@ class Graph:
         print(f'Initialized new point with {num_edges} edges!')
 
 
+class Graph_Save:
+    # To minimize .pickle file size and avoid pickle recursion error
+    def __init__(self):
+        self.points = set()
+        self.edges = set()
+        self.epsilon = -1
+
+    def save(self, graph):
+        points = set()
+        edges = set()
+        for point in graph.points:
+            points.add((tuple(point.pos), point.id))
+            for neighbour_distance in point.neighbours:
+                neighbour = point.neighbours[neighbour_distance]
+                edges.add(tuple(sorted([point.id, neighbour.id])))
+        self.points = points
+        self.edges = edges
+        self.epsilon = graph.epsilon
+
+    def restore(self):
+        points = []
+        id_point_mapping = dict()
+        for point in self.points:
+            point_pos, point_id = point
+            point_obj = Point(point_pos, point_id)
+            points.append(point_obj)
+            id_point_mapping[point_id] = point_obj
+        for edge in self.edges:
+            point_id, neighbour_id = edge
+            point_obj = id_point_mapping[point_id]
+            neighbour_obj = id_point_mapping[neighbour_id]
+            point_obj.become_neighbour(neighbour_obj)
+        return Graph(points=points, epsilon=self.epsilon)
+
+
 def generate_id(size=16, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-'):
     return ''.join(random.choice(alphabet) for i in range(size))
 
@@ -220,39 +269,41 @@ def generate_random_points(dimension, num):
     return [Point([random.uniform(-10.0, 10.0) for j in range(dimension)], generate_id()) for i in range(num)]
 
 
-# To be substituted by real cluster data from kmeans branch:
-# k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 100)
-# k_means.run_n_times(1)
 pickle_file = open(f'Cluster_Final.pickle', 'rb')
-k_means = pickle.load(file=pickle_file)
-# clusters = k_means.get_clusters()
-# c = list(clusters.values())[0]
-# c = generate_random_points(11, 1500)
+centroid_to_clusters = pickle.load(file=pickle_file)
+clusters = list(centroid_to_clusters.values())
+smallest_cluster = None
+for cluster in clusters:
+    if smallest_cluster == None or len(cluster) < len(smallest_cluster):
+        smallest_cluster = cluster
+c = smallest_cluster
+# c = generate_random_points(3, 100)
 
-# g = Graph(points=c, epsilon=0.25)
-# g.init_edges()
+
+g = Graph(points=c, epsilon=0.25)
+g.init_edges()
 # g.draw_with_matplotlib()
 
-# g.save_state(file_name='Cluster_State')
+g.save_state(file_name='Cluster_State')
+
+input_songs = [song.id for song in c[:10]]
+recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
+print('Recommendations:', recommendations)
+print('Fails:', fails)
 #
-# input_songs = [song.id for song in c[:10]]
-# recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
-# print('Recommendations:', recommendations)
-# print('Fails:', fails)
-#
-# input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
-# assert not input_in_recommendation
+input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
+assert not input_in_recommendation
 
 # Test unpickling
-# g_copy = Graph()
-# g_copy.restore_from_state(file_name='Cluster_State')
+g_copy = Graph()
+g_copy.restore_from_state(file_name='Cluster_State')
 #
-# points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
-# assert points_restored
-# epsilon_restored = g.epsilon == g_copy.epsilon
-# assert epsilon_restored
-# id_point_mapping_restored = all(str(g.id_point_mapping[song_id]) == str(
-#     g_copy.id_point_mapping[song_id]) for song_id in g.id_point_mapping)
-# assert id_point_mapping_restored
-# song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
-# assert song_ids_restored
+points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
+assert points_restored
+epsilon_restored = g.epsilon == g_copy.epsilon
+assert epsilon_restored
+id_point_mapping_restored = all(str(g.id_point_mapping[song_id]) == str(
+    g_copy.id_point_mapping[song_id]) for song_id in g.id_point_mapping)
+assert id_point_mapping_restored
+song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
+assert song_ids_restored
