@@ -16,7 +16,12 @@ class SpotifyClient:
         :param user_id (str): Spotify user id
         """
         self._user_id = user_id
-        self._authorization_token = "BQB5RWcJEmQ7meAHN3OnV0u2b3Yc7MpfVCIwI4vjs3YM8H4Bkq2JnWz_6roicsob2iyd4WuXLh6jDCEv86Da9eoDGA7ZBnZaDDpO6k6hrXAeFGPvMjH5urNOOVjYWfukRZgqS2L_hrLs1l554GZd1Cs9T2s_o9rc4Lj14uHgFokF2z-_Wz_oe1UQ0mchJ9SJ-ZJZ_ng3_qfrashqJG8zubSWhGG8I011evoQVX4o1EUB2n78qTzf6g7MQhOoKhgAoTpuy30wSTozMBi6ZINSTcora9nJ7BDUkN1fql9U"
+        self._authorization_token = util.prompt_for_user_token(user_id, 'playlist-modify-public',
+                                                               client_id='daf1fbca87e94c9db377c98570e32ece',
+                                                               client_secret='1a674398d1bb44859ccaa4488df1aaa9',
+                                                               redirect_uri='http://localhost/')
+        # spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth('daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9',  'http://localhost/'))
+        # "BQB5RWcJEmQ7meAHN3OnV0u2b3Yc7MpfVCIwI4vjs3YM8H4Bkq2JnWz_6roicsob2iyd4WuXLh6jDCEv86Da9eoDGA7ZBnZaDDpO6k6hrXAeFGPvMjH5urNOOVjYWfukRZgqS2L_hrLs1l554GZd1Cs9T2s_o9rc4Lj14uHgFokF2z-_Wz_oe1UQ0mchJ9SJ-ZJZ_ng3_qfrashqJG8zubSWhGG8I011evoQVX4o1EUB2n78qTzf6g7MQhOoKhgAoTpuy30wSTozMBi6ZINSTcora9nJ7BDUkN1fql9U"
         # util.prompt_for_user_token(self._user_id, 'playlist-modify-public')
         self._tracks = recommended_tracks
         self._url = ''
