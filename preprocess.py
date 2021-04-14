@@ -38,7 +38,7 @@ class Data:
     def __init__(self):
         """Initializes a object that stores the music data as a pandas dataframe. Contains
         function to normalize any new data based on data in our dataset."""
-        self.data = pd.read_csv('Data/music_data.csv')
+        self.data = pd.read_csv('Preprocess Data/music_data.csv')
 
     def normalize_value(self, pos: list) -> list:
         """Normalizes a list of values based on the data in our dataset.

@@ -4,6 +4,10 @@ import pickle
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from Point import Point
+from preprocess import Data
+
+DATA = Data()
+
 
 class Graph:
     def __init__(self, points=[], epsilon=-1):
@@ -180,8 +184,10 @@ class Graph:
 
         return {'success': False}
 
-    def get_new_song_pos():
-        pass
+    def get_new_song_pos(self, song_id: str):
+        spotify_pos = spotify(id)
+        normalized_pos = DATA.normalize_value(spotify_pos)
+        return normalized_pos
 
     def init_new_point(self, new_point):
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
