@@ -221,8 +221,10 @@ def generate_random_points(dimension, num):
 
 
 # To be substituted by real cluster data from kmeans branch:
-k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 100)
-k_means.run_n_times(1)
+# k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 100)
+# k_means.run_n_times(1)
+pickle_file = open(f'Cluster_Final.pickle', 'rb')
+k_means = pickle.load(file=pickle_file)
 # clusters = k_means.get_clusters()
 # c = list(clusters.values())[0]
 # c = generate_random_points(11, 1500)
