@@ -16,7 +16,7 @@ df = pd.read_csv('data.csv')
 data_ids = set(df['id'])
 track_features = {}
 
-# playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea0789fbdb74657&nd=1'
+playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea0789fbdb74657&nd=1'
 
 
 def get_total_track_ids(playlist_link) -> list:
@@ -72,4 +72,4 @@ def get_non_existing_track_ids() -> list:
 
 # print(get_existing_track_ids())
 # print(get_non_existing_track_ids())
-# print(get_non_existing_track_features())
+print(get_non_existing_track_features())
