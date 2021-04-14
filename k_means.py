@@ -6,6 +6,7 @@ path 'Kmeans Data/normalized_data_final.csv' and k of 150
 
 from __future__ import annotations
 from typing import Optional, List, Union
+from Point import Point
 import random
 import csv
 
@@ -111,32 +112,6 @@ class KMeansAlgo:
         """Returns the clusters stored in the object as a list of lists where each inner
         list is a cluster."""
         return self.clusters
-
-
-class Point:
-    """Class representing a point/song in the program.
-
-    Attributes:
-        - id: A string representing the spotify id that is is used to retrieve song information.
-        - pos: A list of floats that represents the position of the point in n-dimensions, where n\
-        is the length of pos
-    """
-    id: Optional[str]
-    pos: list
-
-    def __init__(self, pos: list, id: str = 'NA'):
-        """Initializes a Point object. The id value is default to 'NA' if none is provided"""
-        self.pos = pos
-        self.id = id
-
-    def distance_from(self, point: Point) -> float:
-        """Returns the Euclidean Distance between self and another point."""
-        dimension = len(self.pos)
-        accumulator = 0
-        for i in range(dimension):
-            delta = self.pos[i] - point.pos[i]
-            accumulator += delta ** 2
-        return accumulator ** 0.5
 
 
 def load_path(path: str) -> List[List]:

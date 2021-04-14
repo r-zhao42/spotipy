@@ -3,38 +3,7 @@ from collections import deque
 import pickle
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
-
-class Point:
-    def __init__(self, pos, point_id):
-        self.pos = pos
-        self.id = point_id
-        self.neighbours = dict()    # distance to Point
-
-    def __repr__(self):
-        return str(self.id)
-
-    def become_neighbour(self, point):
-        distance = self.distance_from(point)
-        while distance in self.neighbours:
-            distance += 10**-300
-        self.neighbours[distance] = point
-        point.neighbours[distance] = self
-
-    def is_neighbour_with(self, point):
-        return point in self.neighbours.values()
-
-    def get_neighbour(self, distance):
-        return self.neighbours[distance]
-
-    def distance_from(self, point):
-        dimension = len(self.pos)
-        accumulator = 0
-        for i in range(dimension):
-            delta = self.pos[i] - point.pos[i]
-            accumulator += delta ** 2
-        return accumulator ** 0.5
-
+from Point import Point
 
 class Graph:
     def __init__(self, points=[], epsilon=-1):
