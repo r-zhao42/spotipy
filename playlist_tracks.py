@@ -19,7 +19,7 @@ track_features = {}
 # playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea0789fbdb74657&nd=1'
 
 
-def get_total_track_ids(playlist_link):
+def get_total_track_ids(playlist_link) -> list:
     """
     Given the user's playlist URI, return a list of track ids included in the playlist,
     excluding the tracks that do not exist in the dataset.
@@ -33,26 +33,7 @@ def get_total_track_ids(playlist_link):
     return(total_song_id_list)
 
 
-def parse_link_to_id(playlist_link):
-    split_url = playlist_link.split('/')
-    splitted = split_url[4]
-    split_again = splitted.split('?')
-    playlist_id = split_again[0]
-    print(playlist_id)
-    return playlist_id
-
-
-def get_existing_track_ids():
-    return list(
-        set(get_total_track_ids(playlist_link)).intersection(data_ids))
-
-
-def get_non_existing_track_ids():
-    return list(
-        set(get_total_track_ids(playlist_link)).difference(data_ids))
-
-
-def get_non_existing_track_features():
+def get_non_existing_track_features() -> dict:
     """
     Return dictionary of track features, the keys represent 
     the track ids and the values are a list for each track's feature ordered in this fashion
@@ -68,6 +49,26 @@ def get_non_existing_track_features():
                                          features[0]['loudness'], features[0]['speechiness'], features[0]['key']])
 
     return track_features
+
+
+def parse_link_to_id(playlist_link) -> str:
+    split_url = playlist_link.split('/')
+    splitted = split_url[4]
+    split_again = splitted.split('?')
+    playlist_id = split_again[0]
+    print(playlist_id)
+    return playlist_id
+
+
+def get_existing_track_ids() -> list:
+    return list(
+        set(get_total_track_ids(playlist_link)).intersection(data_ids))
+
+
+def get_non_existing_track_ids() -> list:
+    return list(
+        set(get_total_track_ids(playlist_link)).difference(data_ids))
+
 
 # print(get_existing_track_ids())
 # print(get_non_existing_track_ids())
