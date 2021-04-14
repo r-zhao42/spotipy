@@ -280,4 +280,9 @@ def initialize_data(data: List[List]) -> List[Point]:
 if __name__ == "__main__":
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
+<<<<<<< HEAD
     k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 20)
+=======
+    # k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 4)
+    pass
+>>>>>>> d19400608ebd075af2a31ac09cc29af27ace9fd0

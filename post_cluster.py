@@ -3,10 +3,16 @@ from collections import deque
 import pickle
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import spotipy
 from Point import Point
 from preprocess import Data
+from Spotify.song_features import get_features
+from k_means import KMeansAlgo
 
 DATA = Data()
+CLIENT_CREDENTIALS_MANAGER = spotipy.oauth2.SpotifyClientCredentials(
+    'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
+SPOTIPY = spotipy.Spotify(client_credentials_manager=CLIENT_CREDENTIALS_MANAGER)
 
 
 class Graph:
@@ -122,10 +128,6 @@ class Graph:
             else:
                 # Handle song not in graph
                 pos = self.get_new_song_pos()
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                # METHOD NOT IMPLEMENTED YET. NEED TO WORK WITH SPOTIFY AND PREPROCESS BRANCHES!
-                # THIS FUNCTION NEEDS TO BLOCK RUNTIME!
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 new_song = Point(pos, input_song_id)
                 self.init_new_point(new_song)
 
@@ -185,7 +187,7 @@ class Graph:
         return {'success': False}
 
     def get_new_song_pos(self, song_id: str):
-        spotify_pos = spotify(id)
+        spotify_pos = get_features(song_id, SPOTIPY)
         normalized_pos = DATA.normalize_value(spotify_pos)
         return normalized_pos
 
@@ -219,9 +221,13 @@ def generate_random_points(dimension, num):
 
 
 # To be substituted by real cluster data from kmeans branch:
-c = generate_random_points(dimension=3, num=100)
+k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 10)
+k_means.run_n_times(1)
+clusters = k_means.get_clusters()
+c = list(clusters.values())[0]
+# c = generate_random_points(11, 1500)
 
-g = Graph(points=c, epsilon=7)
+g = Graph(points=c, epsilon=0.25)
 g.init_edges()
 # g.draw_with_matplotlib()
 
