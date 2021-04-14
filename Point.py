@@ -10,7 +10,7 @@ class Point:
     def become_neighbour(self, point):
         distance = self.distance_from(point)
         while distance in self.neighbours:
-            distance += 10 ** -300
+            distance += 0.0000000001
         self.neighbours[distance] = point
         point.neighbours[distance] = self
 

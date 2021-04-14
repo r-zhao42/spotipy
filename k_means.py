@@ -153,3 +153,4 @@ if __name__ == "__main__":
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
     # k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 4)
+    pass

@@ -7,11 +7,12 @@ import spotipy
 from Point import Point
 from preprocess import Data
 from Spotify.song_features import get_features
+from k_means import KMeansAlgo
 
 DATA = Data()
 CLIENT_CREDENTIALS_MANAGER = spotipy.oauth2.SpotifyClientCredentials(
     'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
-SPOTIPY = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+SPOTIPY = spotipy.Spotify(client_credentials_manager=CLIENT_CREDENTIALS_MANAGER)
 
 
 class Graph:
@@ -220,9 +221,13 @@ def generate_random_points(dimension, num):
 
 
 # To be substituted by real cluster data from kmeans branch:
-c = generate_random_points(dimension=3, num=100)
+k_means = KMeansAlgo("Kmeans Data/normalized_data_final.csv", 10)
+k_means.run_n_times(1)
+clusters = k_means.get_clusters()
+c = list(clusters.values())[0]
+# c = generate_random_points(11, 1500)
 
-g = Graph(points=c, epsilon=7)
+g = Graph(points=c, epsilon=0.25)
 g.init_edges()
 # g.draw_with_matplotlib()
 
