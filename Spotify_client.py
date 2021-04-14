@@ -6,7 +6,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import requests
 
 
-
 class SpotifyClient:
     """SpotifyClient performs operations using the Spotify API."""
 
@@ -18,7 +17,6 @@ class SpotifyClient:
         self._authorization_token = authorization_token
         self._user_id = user_id
         self._url = ''
-
 
     def create_playlist(self, name):
         """
@@ -39,7 +37,7 @@ class SpotifyClient:
         playlist = Playlist(name, playlist_id)
         return playlist
 
-    def populate_playlist(self, playlist, tracks):
+    def add_to_playlist(self, playlist, tracks):
         """Add tracks to a playlist.
         :param playlist (Playlist): Playlist to which to add tracks
         :param tracks (list of Track): Tracks to be added to playlist
@@ -72,13 +70,11 @@ class SpotifyClient:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {self._authorization_token}"
             }
-    )
+        )
         return response
 
 
-test_tracks = [Track('537l7spEsGg6aWl6Y9eKAs'), Track('537l7spEsGg6aWl6Y9eKAs')]
-client = SpotifyClient('BQCc0fzzNOmtDH1WyelW-1ZWupJzJnIrrobXhLY-iyF31zd6bEF3QBoYdqIC3HLBQda_uhs9ATDZKSzFIbUj_F-2plU4FFus3K7Y7LswTqcMwzvx2WmFG4YWx_rtDACUxyN0WIJKVsTGZlKaA8jhlpQpApkqYzcHfYb4sZHizKT0P6iso-ZaYXZHqKagELZCWSWky1nWuxcg9nGHL2nCZn5An7HZsJFWRqs6zm8PWdhp20uu6Un3vxyA74hDVZ6VkwLDNIVjDSKvzwm2pq7xQ5T_Yp7bocjn8qPFXb3O', 	'i2fc15uzt49drjhsp3fjcqqdw')
-client.populate_playlist(client.create_playlist('fun'), test_tracks)
-
-
-
+test_tracks = [Track('537l7spEsGg6aWl6Y9eKAs'),
+               Track('537l7spEsGg6aWl6Y9eKAs')]
+client = SpotifyClient('BQDoEBWmQsYhROEMQ-z-B2ycIS3JpLLFlkKRHwEo6w4IUtUgbje3o3IntTJUwdRyD00D3rpvpJvSrxvg0SJ5CyUNniYaktKfsaKAaES89zpPWuNmHwxwjUDhryRjpGFVTDnY--8ceTExEjuixnGlJOuVtcszIgffyZQU_pvz1twRk17irA1K8nZClwlXIOa2M1s74AiV1cFTAfwiqSXwT8C7Xmyq9HtmkmprslcdEpHDCFrXyVck3526wvL6OeJ-rYL6wknugJ9athrvlpG9IShLAEn0a2rIGh1vC41Z', 	'i2fc15uzt49drjhsp3fjcqqdw')
+client.add_to_playlist(client.create_playlist('fun'), test_tracks)
