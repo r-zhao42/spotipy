@@ -32,7 +32,8 @@ import pandas as pd
 
 
 class Data:
-    """A class to store the data with function mainly to normalize new song data"""
+    """A class to store the the unnormalized music data
+     This class is used to normalize new song data in the post_cluster module"""
     data: pd.DataFrame
 
     def __init__(self):
@@ -41,7 +42,8 @@ class Data:
         self.data = pd.read_csv('Data/music_data.csv')
 
     def normalize_value(self, pos: list) -> list:
-        """Normalizes a list of values based on the data in our dataset.
+        """Normalizes a list of values based on the data in our dataset. Return a new list of
+        normalized values, doesn't not mutate the original
 
         Preconditions:
             - pos is a list of floats that is ordered so that each element represents the following:
@@ -50,8 +52,8 @@ class Data:
         """
         duration = pos[3]
         tempo = pos[6]
-        loudness = pos[7]
-        key = pos[9]
+        loudness = pos[8]
+        key = pos[10]
 
         normalized_duration = (duration - self.data['duration_ms'].min()) / \
                               (self.data['duration_ms'].max() - self.data['duration_ms'].min())
@@ -63,7 +65,7 @@ class Data:
                               (self.data['key'].max() - self.data['key'].min())
 
         return pos[:3] + [normalized_duration] + pos[4:6] + \
-               [normalized_tempo, normalized_loudness] + [pos[8]] + [normalized_key]
+               [normalized_tempo] + [pos[7]] + [normalized_loudness] + [pos[9]] + [normalized_key]
 
 
 def normalize_df(df: pd.DataFrame, column_name: str):
@@ -117,3 +119,7 @@ if __name__ == "__main__":
     columns_to_normalize = ['duration_ms', 'tempo', 'loudness', 'key']
     # Call the following function to process data:
     # preprocess_data(file, columns_more_dropped_titles, columns_to_normalize, 'music_data.csv', True)
+    unnormalizes = [0.991, 0.598, 0.224, 168333, 0.000522, 0.634, 149.976, 0.379, -12.628, 0.0936, 5]
+    data = Data()
+    normalize = data.normalize_value(unnormalizes)
+    len(normalize)
