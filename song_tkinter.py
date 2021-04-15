@@ -38,7 +38,7 @@ class UserPlaylistEntry:
         self.att_1 = ''
         self.att_2 = ''
         self.att_3 = ''
-        self.graph_int = ''
+        self.graph_int = 0
 
         self._image = Image.open('Spotify-Logo.png').resize((140, 100))
 
@@ -181,18 +181,23 @@ class UserPlaylistEntry:
         attribute2 = self.att_2
         attribute3 = self.att_3
 
+        # This is the case where we did not select Graph Visualization, in this case I am doing this
+        # in order not to receive type error when checking if self.graph > 100 on line 200
+        if self.graph_int == '':
+            self.graph_int = 0
+
         if self.visualization == 'K-means':
             # Run the 2D Function
             pass
 
-        if (self.visualization != 'Choose Visualization' or
-            self.visualization != '') and (self.att_1 != '' or
-            self.att_1 != 'Attribute 1') and (self.att_2 != '' or
-            self.att_2 != 'Attribute 2') and (self.att_3 != '' or
+        if (self.visualization != 'Choose Visualization' and
+            self.visualization != '') and (self.att_1 != '' and
+            self.att_1 != 'Attribute 1') and (self.att_2 != '' and
+            self.att_2 != 'Attribute 2') and (self.att_3 != '' and
                                               self.att_3 != 'Attribute 3'):
 
             # If the input is higher than 100, automatically set to the highest (100)
-            if isinstance(int(self.graph_int), int) and int(self.graph_int) > 100:
+            if int(self.graph_int) > 100:
                 self.graph_int = 100
 
             print(self.playlist_entry)
