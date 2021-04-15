@@ -52,8 +52,8 @@ if __name__ == '__main__':
     song_id_to_features = []
     for song_id in song_ids:
         features = get_features(song_id, sp)
-        data.normalize_value(features)
-        song_id_to_features.append([song_id, features])
+        normalized_features = data.normalize_value(features)
+        song_id_to_features.append([song_id, normalized_features])
     print('Done getting song ids, features; and normalizing features!\n', end='\r')
 
     # For each song in song_id_to_features,
@@ -87,10 +87,9 @@ if __name__ == '__main__':
     for centroid in centroid_to_songs:
         cur_input_songs = centroid_to_songs[centroid]
         cur_graph = centroid_to_graph[centroid]
-        for song in cur_input_songs:
-            recommendations, fails = cur_graph.recommend(
-                input_song_ids=cur_input_songs, adventure=args.adventure)
-            all_recommendations.extend(recommendations)
+        recommendations, fails = cur_graph.recommend(
+            input_song_ids=cur_input_songs, adventure=args.adventure)
+        all_recommendations.extend(recommendations)
     print('Done making recommendations!')
 
     out_file = open('Recommendations.txt', 'w')
