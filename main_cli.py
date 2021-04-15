@@ -56,13 +56,12 @@ if __name__ == '__main__':
         song_id_to_features.append([song_id, normalized_features])
     print('Done getting song ids, features; and normalizing features!\n', end='\r')
 
-    # ======================================
-    # ABOVE IS OK
-    # ======================================
-
-    # ++++++++++++++++++++++++++++++++++++++
-    # NEW: song_to_centroid
-    # ++++++++++++++++++++++++++++++++++++++
+    # Match each song with a graph
+    # - If the song can be found in Graph_Final.pickle / Graph_Final_Evolve.pickle:
+    #       Match song with graph
+    # - If the song cannot be found:
+    #       Match song with closest graph (by checking distance to graph centroid)
+    print('Matching songs with graphs...', end='\r')
     song_to_centroid = dict()
     for song in song_id_to_features:
         cur_song_id, cur_song_features = song
@@ -89,11 +88,9 @@ if __name__ == '__main__':
                     closest_centroid = centroid
                     closest_centroid_distance = distance_to_centroid
             song_to_centroid[cur_song_id] = closest_centroid
-
-    # ++++++++++++++++++++++++++++++++++++++
-    # NEW: Make recommendations based on song_to_centroid
-    # Convert to centroid_to_songs first to avoid duplicate recommendations
-    # ++++++++++++++++++++++++++++++++++++++
+    # Before making recommendations:
+    # Convert song_to_centroid => centroid_to_songs
+    # to avoid duplicate recommendations
     centroid_to_songs = dict()
     for song in song_to_centroid:
         corresponding_centroid = song_to_centroid[song]
@@ -101,36 +98,11 @@ if __name__ == '__main__':
             centroid_to_songs[corresponding_centroid].extend([song])
         else:
             centroid_to_songs[corresponding_centroid] = [song]
-
-    # --------------------------------------
-    # DEPRECATED
-    # --------------------------------------
-    # For each song in song_id_to_features,
-    # find out which Graph centroid the song is closest to
-    """
-    print('Finding the closest Graph centroid for each song...', end='\r')
-    centroid_to_songs = dict()      # Centroid (Point) mapping to list of song ids
-    for song in song_id_to_features:
-        closest_centroid = None
-        closest_centroid_distance = None
-        # Represent current song as a point to use
-        cur_song_id, cur_song_features = song
-        cur_point = Point(pos=cur_song_features, point_id=cur_song_id)
-        for centroid in centroid_to_graph:
-            distance_to_centroid = cur_point.distance_from(centroid)
-            if closest_centroid_distance == None or distance_to_centroid < closest_centroid_distance:
-                closest_centroid = centroid
-                closest_centroid_distance = distance_to_centroid
-        if closest_centroid in centroid_to_songs:
-            centroid_to_songs[closest_centroid].append(cur_point.id)
-        else:
-            centroid_to_songs[closest_centroid] = [cur_point.id]
-    print('Done finding the closest Graph centroid for each song!\n', end='\r')
-    """
+    print('Done matching songs with graphs!\n', end='\r')
 
     # For each centroid in centroid_to_songs:
     # - g = centroid_to_graph[centroid]
-    # - songs centroid_to_songs[centroid]
+    # - songs = centroid_to_songs[centroid]
     # - Use songs as input to g to make recommendations
     # Combine all recommendations
     print('Making recommendations...', end='\r')
@@ -141,9 +113,11 @@ if __name__ == '__main__':
         recommendations, fails = cur_graph.recommend(
             input_song_ids=cur_input_songs, adventure=args.adventure)
         all_recommendations.extend(recommendations)
-    print('Done making recommendations!')
+    print('Done making recommendations!\n', end='\r')
 
+    # Write recommendations to file
+    print('Writing to Recommendations.txt...', end='\r')
     out_file = open('Recommendations.txt', 'w')
     for recommendation in all_recommendations:
         out_file.write(f'{recommendation}\n')
-    # print(f'{len(all_recommendations)}Recommendations: ', all_recommendations)
+    print('Done Writing to Recommendations.txt!\n', end='\r')
