@@ -61,8 +61,10 @@ if __name__ == '__main__':
     #       Match song with graph
     # - If the song cannot be found:
     #       Match song with closest graph (by checking distance to graph centroid)
+    #       And mutate Graph (to be saved)
     print('Matching songs with graphs...', end='\r')
     song_to_centroid = dict()
+    graph_mutate = False
     for song in song_id_to_features:
         cur_song_id, cur_song_features = song
         is_in_dataset = False
@@ -79,6 +81,7 @@ if __name__ == '__main__':
             song_to_centroid[cur_song_id] = corresponding_centroid
         else:
             # If song not in dataset, find closest centroid
+            graph_mutate = True     # Here graph_mutate means: Graph will mutate
             closest_centroid = None
             closest_centroid_distance = None
             cur_point = Point(pos=cur_song_features, point_id=cur_song_id)
@@ -121,3 +124,25 @@ if __name__ == '__main__':
     for recommendation in all_recommendations:
         out_file.write(f'{recommendation}\n')
     print('Done Writing to Recommendations.txt!\n', end='\r')
+
+    # If graph(s) mutated: Save to Graph_Final_Evolve.pickle
+    # Unlike before, here graph_mutate means: Graph mutated
+    if graph_mutate:
+        print('Graph(s) were mutated during the recommendation process,', end=' ')
+        print('because the input playlist included song(s) that were not found in the graph file.\n', end='\r')
+        print('Saving mutated Graphs to Graph_Final_Evolve.pickle...')
+        centroid_to_graph_save = dict()
+        for centroid in centroid_to_graph:
+            cur_graph = centroid_to_graph[centroid]
+            cur_graph_save = Graph_Save()
+            cur_graph_save.save(cur_graph)
+            centroid_to_graph_save[centroid] = cur_graph_save
+        save_file = open('Graph_Final_Evolve.pickle', 'wb')
+        pickle.dump(obj=centroid_to_graph_save, file=save_file, protocol=pickle.HIGHEST_PROTOCOL)
+        save_file.close()
+        print('Done saving mutated Graphs to Graph_Final_Evolve.pickle!')
+    else:
+        print('Graph(s) were not mutated during the recommendation process,', end=' ')
+        print('because all songs in the input playlist were found in the graph file.\n', end='\r')
+
+    print("Process is exiting...")
