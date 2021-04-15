@@ -1,7 +1,10 @@
 """A module containing the classes needed to perform the k-means clustering algorithm
 
 For our project, to use this module, a KMeansAlgo object should be initialized with the
-path 'Kmeans Data/normalized_data_final.csv' and k of 150
+path 'Data/normalized_data_final.csv' and k of 100. we ran the clustering algorithm
+15 times to refine the clusters.
+
+
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ class KMeansAlgo:
         - centroids: A list of Point objects that describe the centers of the cluster
         - cluster: A dictionary mapping a centroid to a list of Points in that cluster
 
-    Preconditions:
+    Representation Invariants:
         - k > 0
     """
 
@@ -56,18 +59,24 @@ class KMeansAlgo:
         """Sorts every point in self.data into a cluster based on the centroid that the point
         is closest to. Returns a dictionary mapping each centroid to a list of points which
         represents the clusters."""
+        # initialize a dictionary mapping each current centroid to a empty list
         clusters = dict((key, []) for key in self.centroids)
+
+        # Iterate through every data point and sort into a centroid based on distance
         for i in range(len(self.data)):
             point = self.data[i]
             closest_center = self.centroids[0]
             min_distances = point.distance_from(closest_center)
 
+            # Iterate through each centroid and check distance between centroid and point
+            # Closest centroid is saved in closest_center
             for centroid in self.centroids:
                 curr_distance = point.distance_from(centroid)
                 if curr_distance < min_distances:
                     min_distances = curr_distance
                     closest_center = centroid
 
+            # Append current point to the cluster of the associated center
             clusters[closest_center].append(point)
 
         return clusters
@@ -75,27 +84,39 @@ class KMeansAlgo:
     def find_new_centroids(self, clusters: dict) -> List[Point]:
         """Finds the centers of each cluster and returns the new center as a list of Points"""
         new_centroids = []
+
+        # Iterate through the clusters and update each center
         for centroid in clusters:
+
+            # Helper function finds the new center for each individual cluster
             new = self._update_centroid(centroid, clusters[centroid])
             new_centroids.append(new)
+
+        # returns a list of the new centroids which will be used to update the clusters
         return new_centroids
 
     def _update_centroid(self, centroid: Point, points: list) -> Point:
         """Returns the new center of the cluster associated with the given centroid. If the
         cluster is empty, then the original centroid is returned. Otherwise, a new Point object
         is created with the position of the new center is returned."""
+
         if len(points) == 0:
+            # If the length of the associated cluster is 0, return original centroid
             return centroid
         else:
+            # If length of associated cluster is > 0, find new centroid
             new_pos = []
             dimensions = len(centroid.pos)
 
+            # Iterate through each attribute of the clusters and find the average
             for i in range(dimensions):
                 accumulator = 0
                 for point in points:
                     accumulator += point.pos[i]
-
+                # Append the average to the pos value of new centroid
                 new_pos.append(accumulator / len(points))
+
+            # Return point object with pos of new centroid
             return Point(new_pos)
 
     def print_cluster_len(self) -> None:
@@ -115,9 +136,10 @@ class KMeansAlgo:
         list is a cluster."""
         return self.clusters
 
-    def graph_3d(self, x: str, y: str, z: str):
+    def graph_3d(self, x: str, y: str, z: str, n: int):
         """
-        Graph the clusters in 3 dimensions based on the attributes given for x, y, and z
+        Graph the furthest n clusters in 3 dimensions based on the attributes given
+        for x, y, and z.
 
         Preconditions:
              - x in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
@@ -126,7 +148,13 @@ class KMeansAlgo:
             tempo, liveness, loudness, speechiness, key}
             - z in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
             tempo, liveness, loudness, speechiness, key}
+            - n <= len(self.cluster)
         """
+        # If matplotlib is displaying a graph, clear the graph
+        if plt.get_fignums():
+            plt.clf()
+
+        # Map input str to associated index in pos
         attribute_to_index = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
                               'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
                               'loudness': 8, 'speechiness': 10, 'key': 11}
@@ -136,9 +164,13 @@ class KMeansAlgo:
         z_index = attribute_to_index[z]
         points = []
 
-        for cluster in self.clusters:
+        # Find n centroids that are the furthest from each other
+        clusters_to_graph = self.find_furthest_n_clusters(n)
+
+        for cluster in clusters_to_graph:
             points.extend(self.clusters[cluster])
 
+        # Generate the x, y, z values to plot
         x = [point.pos[x_index] for point in points]
         y = [point.pos[y_index] for point in points]
         z = [point.pos[z_index] for point in points]
@@ -151,8 +183,9 @@ class KMeansAlgo:
         colors = []
         colors_choices = list(plt.cm.colors.cnames)
 
-        c_i = 0
-        for cluster in self.clusters:
+        # Generate color map for graph
+        c_i = 10
+        for cluster in clusters_to_graph:
             for _ in self.clusters[cluster]:
                 colors.append(colors_choices[c_i])
             c_i += 1
@@ -161,12 +194,13 @@ class KMeansAlgo:
         for _ in range(len(self.centroids)):
             colors.append('black')
 
+        # Plot graph
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         ax.scatter(xs=x, ys=y, zs=z, color=colors)
         plt.show()
 
-    def graph_2d(self, x: str, y: str):
+    def graph_2d(self, x: str, y: str, n: int):
         """
         Graph the clusters in 2 dimensions based on the attributes given for x and y
 
@@ -175,8 +209,14 @@ class KMeansAlgo:
             tempo, liveness, loudness, speechiness, key}
             - y in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
             tempo, liveness, loudness, speechiness, key}
+            - n <= len(self.clusters)
         """
-        attribute_to_index = {'acousticness' : 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
+        # If matplotlib is displaying a graph, clear the graph
+        if plt.get_fignums():
+            plt.clf()
+
+        # Map input str to associated index in pos
+        attribute_to_index = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
                               'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
                               'loudness': 8, 'speechiness': 10, 'key': 11}
 
@@ -185,9 +225,13 @@ class KMeansAlgo:
 
         points = []
 
-        for cluster in self.clusters:
+        # Find n centroids that are the furthest from each other
+        clusters_to_graph = self.find_furthest_n_clusters(n)
+
+        for cluster in clusters_to_graph:
             points.extend(self.clusters[cluster])
 
+        # Generate the x, y values to plot
         x = [point.pos[x_index] for point in points]
         y = [point.pos[y_index] for point in points]
 
@@ -198,8 +242,9 @@ class KMeansAlgo:
         colors = []
         colors_choices = list(plt.cm.colors.cnames)
 
-        c_i = 0
-        for cluster in self.clusters:
+        # Generate color map for graph
+        c_i = 10
+        for cluster in clusters_to_graph:
             for _ in self.clusters[cluster]:
                 colors.append(colors_choices[c_i])
             c_i += 1
@@ -209,9 +254,38 @@ class KMeansAlgo:
         for _ in range(len(self.centroids)):
             colors.append('black')
 
+        # Plot graph
         plt.scatter(x, y, c=colors)
         plt.show()
 
+    def find_furthest_n_clusters(self, n: int) -> list:
+        """Returns a list of clusters that are far away from each other"""
+        centroids = list(self.clusters)
+        distances = []
+
+        # Find the distances of every unique pair of centroids and store in list as tuple
+        # with values as distance, centroid1, centroid2
+        for i in range(len(centroids)):
+            centroid1 = centroids[i]
+            for j in range(i, len(centroids)):
+                centroid2 = centroids[j]
+                if centroid1 != centroid2:
+                    distances.append((centroid1.distance_from(centroid2), centroid1, centroid2))
+        # Sort the tuples by descending distance
+        distances.sort(reverse=True)
+
+        result = set()
+
+        i = 0
+
+        # Take the first n values and put the centroids in a list
+        while len(result) < n:
+            result.add(distances[i][1])
+            result.add(distances[i][2])
+            i += 1
+
+        # Return the result as a list of centroids
+        return list(result)
 
 
 def load_path(path: str) -> List[List]:
@@ -280,6 +354,4 @@ def initialize_data(data: List[List]) -> List[Point]:
 if __name__ == "__main__":
     # raw_data = load_path("Data/normalized_Hayks data with id.csv")
     # data = initialize_data(raw_data)
-    # k_means = KMeansAlgo("Data/normalized_data_final.csv", 20)
-    pass
-
+    k_means = KMeansAlgo("Data/normalized_data_final.csv", 20)
