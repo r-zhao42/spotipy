@@ -1,3 +1,8 @@
 temp_venv
-*.pickle
 test.py
+.DS_Store
+.idea
+__pycache__
+*.pickle
+!Cluster_Final.pickle
+.cache
