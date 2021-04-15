@@ -5,7 +5,6 @@ Using the Spotify API
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-# import playlist_link from user_input
 
 
 client_credentials_manager = SpotifyClientCredentials(
@@ -15,8 +14,6 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 df = pd.read_csv('data.csv')
 data_ids = set(df['id'])
 track_features = {}
-
-playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea0789fbdb74657&nd=1'
 
 
 def get_total_track_ids(playlist_link) -> list:
@@ -32,13 +29,13 @@ def get_total_track_ids(playlist_link) -> list:
     return(total_song_id_list)
 
 
-def get_non_existing_track_features() -> dict:
+def get_non_existing_track_features(playlist_link) -> dict:
     """
     Return dictionary of track features, the keys represent 
     the track ids and the values are a list for each track's feature ordered in this fashion
     [acousticness, danceability, energy, duration_ms, instrumentalness, valence, tempo, liveliness, loudness, speechiness, key]
     """
-    track_ids = get_non_existing_track_ids()
+    track_ids = get_total_track_ids(playlist_link)
     track_features = {key: [] for key in track_ids}
     for track_id in track_ids:
         features = sp.audio_features('spotify:track:' + track_id)
@@ -59,16 +56,11 @@ def parse_link_to_id(playlist_link) -> str:
     return playlist_id
 
 
-def get_existing_track_ids() -> list:
+def get_existing_track_ids(playlist_link) -> list:
     return list(
         set(get_total_track_ids(playlist_link)).intersection(data_ids))
 
 
-def get_non_existing_track_ids() -> list:
+def get_non_existing_track_ids(playlist_link) -> list:
     return list(
         set(get_total_track_ids(playlist_link)).difference(data_ids))
-
-
-# print(get_existing_track_ids())
-# print(get_non_existing_track_ids())
-print(get_non_existing_track_features())
