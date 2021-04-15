@@ -16,7 +16,7 @@ df = pd.read_csv('data.csv')
 data_ids = set(df['id'])
 track_features = {}
 
-# playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea0789fbdb74657&nd=1'
+playlist_link = 'https://open.spotify.com/playlist/1X2xbG50zdeAv5hAnTvbJU?si=648799b58b7e4e13'
 
 
 def get_total_track_ids(playlist_link) -> list:
@@ -33,13 +33,13 @@ def get_total_track_ids(playlist_link) -> list:
     return(total_song_id_list)
 
 
-def get_non_existing_track_features() -> dict:
+def get_non_existing_track_features(playlist_link) -> dict:
     """
     Return dictionary of track features, the keys represent 
     the track ids and the values are a list for each track's feature ordered in this fashion
     [acousticness, danceability, energy, duration_ms, instrumentalness, valence, tempo, liveliness, loudness, speechiness, key]
     """
-    track_ids = get_non_existing_track_ids()
+    track_ids = get_total_track_ids(playlist_link)
     track_features = {key: [] for key in track_ids}
     for track_id in track_ids:
         features = sp.audio_features('spotify:track:' + track_id)
@@ -60,17 +60,17 @@ def parse_link_to_id(playlist_link) -> str:
     return playlist_id
 
 
-def get_existing_track_ids() -> list:
+def get_existing_track_ids(playlist_link) -> list:
     return list(
         set(get_total_track_ids(playlist_link)).intersection(data_ids))
 
 
-def get_non_existing_track_ids() -> list:
+def get_non_existing_track_ids(playlist_link) -> list:
     return list(
         set(get_total_track_ids(playlist_link)).difference(data_ids))
 
 
-# print(get_existing_track_ids())
-# print(get_non_existing_track_ids())
-# print(get_non_existing_track_features())
-print(get_total_track_ids('https://open.spotify.com/playlist/6ktWPSpBFHFDvCIyg8tjNe'))
+# print(get_existing_track_ids('https://open.spotify.com/playlist/5qUR1BTHhUMucQxb32JxXD?si=ruP35YDrSzqcD4q5CN-srw'))
+# print(get_non_existing_track_ids('https://open.spotify.com/playlist/7ByDxKg4FmhrHe8GASNr23?si=8857e747ec7f4488'))
+print(get_non_existing_track_features())
+# print(get_total_track_ids('https://open.spotify.com/playlist/5qUR1BTHhUMucQxb32JxXD?si=ruP35YDrSzqcD4q5CN-srw'))

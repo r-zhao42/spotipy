@@ -20,9 +20,6 @@ class SpotifyClient:
                                                                client_id='daf1fbca87e94c9db377c98570e32ece',
                                                                client_secret='1a674398d1bb44859ccaa4488df1aaa9',
                                                                redirect_uri='http://localhost:8888/callback')
-        # spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth('daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9',  'http://localhost/'))
-        # "BQB5RWcJEmQ7meAHN3OnV0u2b3Yc7MpfVCIwI4vjs3YM8H4Bkq2JnWz_6roicsob2iyd4WuXLh6jDCEv86Da9eoDGA7ZBnZaDDpO6k6hrXAeFGPvMjH5urNOOVjYWfukRZgqS2L_hrLs1l554GZd1Cs9T2s_o9rc4Lj14uHgFokF2z-_Wz_oe1UQ0mchJ9SJ-ZJZ_ng3_qfrashqJG8zubSWhGG8I011evoQVX4o1EUB2n78qTzf6g7MQhOoKhgAoTpuy30wSTozMBi6ZINSTcora9nJ7BDUkN1fql9U"
-        # util.prompt_for_user_token(self._user_id, 'playlist-modify-public')
         self._tracks = recommended_tracks
         self._url = ''
         self._playlist = self.create_playlist(playlist_name)
@@ -61,16 +58,6 @@ class SpotifyClient:
         self._url = f'https://open.spotify.com/playlist/{playlist_id}'
         return response_json
 
-    def _place_get_api_request(self, url):
-        response = requests.get(
-            url,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self._authorization_token}"
-            }
-        )
-        return response
-
     def _place_post_api_request(self, url, data):
         response = requests.post(
             url,
@@ -83,7 +70,83 @@ class SpotifyClient:
         return response
 
 
-test_tracks = ['3I9zZfbeaRo9ks1MB7zhmR', '5URYXSFGks9Q8eYePlgVdL', '01oc1NWevpGhtCkiX5flPH', '42tBlHWL3VfDkUM2iWcc5p', '5bknBRjKJZ643DAN2w8Yoy', '7bgwME1OmdDy9iUwYYwzts', '5WpLfhGebLyJOSM4xkW6qP', '0ToC28lLiwEKyQdN4FXypS', '1t4pPnbkOjzoA5RvsDjvUU', '55jQMevNp7aWtiW5LPlPoa', '4VYmdTVFXDq0LtYMoVswTv', '5mexbTuWx9d8DPZk4sDGF4', '7oopoWQa0jicMSf9SFtxMK', '6b4A1mLzePAHGn3XCicLAe', '2LNMhZ3YijTO7USmqjgJfG', '6FhEDaaRFyPRMYqhhXivO9', '2NjeQLvFsfeKdZoA7dbfL1', '4d8BSdhx6WT5GtTOWpv4rh', '5vm7y9SmcH0S1NOQanb8rQ', '2maEFaoAyNjQVv14Hm4esN', '7HRv1sYuwgoea1m0JRvChV', '0WWcJVmz8Yj5hOwJkyycxo', '6MU3ZTQNkV9mUcTSHgoxjr', '5BP0oaQ1VhuaznT77CBXQp', '6huoxhxVtmHGMGmq90U6bE', '4Pwjz3DfvfQWV0rO2V8jyh', '3903Tbix9PdoculpJLikHf', '439TlnnznSiBbQbgXiBqAd', '7pdCmGogZHZH3Xv7LnqVrH', '1hgKlrIGwepPfyq2psckW3', '5FxELQREUBIdy6ZRqZ4iuC', '0rFX6pVvOkXvDgiTR5v5kX', '4ox8bpBggBqCQv56b4XXTf', '6lVoMmI02u5rFFgexe9f3G',
-                '295UjwiTtDQdWUDUrKR83W', '2Q0pt1s7gU5GowQDtaZ4CA', '30Yn1oFNYwyLJE1Wlb4Fiy', '73apJ2IYCakxQPuyn4Lp3W', '6NmWJdU1xBEPeK9ydJJ4uL', '7Ks4VCY1wFebnOdJrM13t6', '0N3W5peJUQtI4eyR6GJT5O', '1bxEpNR75Hq3T2oF9AZjt8', '2UOYzhusMTypF7oAQwksCj', '4tQcyj5488alHT1ZgFduzn', '5Mtt6tZSZA9cXTHGSGpyh0', '0v9Wz8o0BT8DU38R4ddjeH', '2Aqc48sn8He26hmTvQ2BMj', '3yM8iyra4fkuyf0H5RFHuE', '6A3hUBzQ0k6chtNJlGxDQn', '1vup3vAmSmFLxSIzGOM38V', '5RbV7Ps6HM2tBbxTd3FnDh', '2DgMxFMUQRPthW4ROhjen1', '1m4C9zlV89rXTfXStluvec', '4eSSRTR5guMgoLaB4YmFwi', '3YDjqMC2P5jW1RjXhaEuK2', '4Cv5PfRm2Qefuaxapdk9XQ', '66ZcOcouenzZEnzTJvoFmH', '6SSLgl0gywQ5Z4dlLj7laX', '0aO3OoQ9VdjiefNa2lwLnn', '6dHatCnuOb1TdBIeJTK3Y0', '1LUyHPbfI0EXbMkvHR0PNX', '7ItFoQDmQIh3MAPsxiP6Vt', '2kmpyKQjVw5UOcVlmkxnYY', '6R0GRYk2vs2XuBVemYK5YZ', '0mXDySw7m2OXK6Wd9hc9Js', '6iMo7yzmXqMC57FOHOSotz', '52d35Deejayu18L7EPCIjU', '0xlFTYyh8qnez0ndGKo5lj', '1eQBEelI2NCy7AUTerX0KS', '53xEdeXpJLWqufWzUeQWbn', '3mmLyEhphJAaW7hyEXAD8l', '4rmCUodFiPbIIV9Vdof42A', '6f4CxfbXGtD1a4VPHEpN48', '7IowzY0ZVbZ9PIrxBPjn92', '3MkYUoEo1Yk1peHN4cof0c', '6VgYcgaeVz0kehOM1qQqd7', '6NvRxjfYkkT2SpirAlmsjH', '5kgvRTKmoJChOc5PAdHZg3', '7oXRMDUzBPekkLRTJhSGvC', '5q453TyHMg7pxYdNG9nufn', '0wmaGiDKtKaRf7G8nBfNsQ', '1Pc3gTtQG4Cq1x81NcXtCN', '4IswprVy2RdWGhiJVKWYau', '4RdQZodcn9NwMVW6sGNnp6', '1Dhi8OBMSyukjUQ93uBfNz', '6mfKEPTYiBAYZ9z0429jsp', '2v8sPwkqVDgWprsmGIis25', '0jYhHo2DhmdkLfonFbPixV', '1cPqCQgCV3qEroz8WYWJK6', '3i5zMNOKm9jR5zLPs4r0Px', '0cAmjsP4d1AXzwAiL38lMr', '1qtYE16BSpHhrY9Tw4CnwU', '35XOKY7RGDCCDO2ovxMMNt', '1NPMFbh4fFDiBMqqcpxASA', '6f0nePKuRRQFfLeROOkt7F', '7llB3cQPT1Yfm7uiVTQTTC', '56zgAN1IE4gLKI2dbvknCI', '5SPFU6mys52n07fem3EXBA', '7bGOND7852tOD0RInMTO0u', '5xrkAXDPhJx44YeNpk9Z1f']
+test_tracks = ['2OCTC6cPRdI3Dvdb25jRDC',
+'5eI3fMgQoYfYh9NykE78Sn',
+'70jb2bIurVzYfxhhsRd4ew',
+'1uDjaezEbalGyGnuH80zDK',
+'6Y9kdB2O0h9gq9y2vclsWT',
+'4VeCg1rkHHiu1utqoNNUhH',
+'5SehvGGC53A7SZKCLXQcyt',
+'5qDlo2g8QwkA36PNqWpDCz',
+'4Tid4MwqgR1CfKCun3tFon',
+'3hoiinUc5VA9xUEJID7R8V',
+'01vaUGpeRew7Tvfxsf4jcQ',
+'4RnSzXTmFBEvGRL7vSCSCO',
+'5dv4YSgkpflUQ31vIW9qXg',
+'4WQJd6v3HIDGZnn2kJTEc9',
+'5mu1uv8RmzDkF8foePK5qa',
+'5YGhm6pI5s0uxJ2DwrDYqO',
+'6SvuMwPea2zKEN03IWCElv',
+'3IrcvqIf3ZiBhf3xdsctRX',
+'43BlKpJcSrC9AsJ3F1DKg9',
+'5MnXRG5LzgSzdpIkg5nagT',
+'1z1btB03Hw1gYwSLPlt67z',
+'26w9NTiE9NGjW1ZvIOd1So',
+'28oZsTW7GQZ47qtmuS0mjl',
+'12PPtN6iHLnPVKuVzxfWSM',
+'5PONCrsJnRyMsHBsnUS6I9',
+'0XGLsSU6wtfnKXiMNvQr61',
+'1eMNW1HQjF1dbb4GtnmpaX',
+'0E8R8Ro8cRouDHCJFbsbP1',
+'3Zcv9IeYgCvEhxFTfsduaQ',
+'0hwkukpHcBJfGcIUxi1tK2',
+'0IJA9KP6rT55jrP1YpTdhx',
+'5NqOsPI4rA9Bl6LcCftzI2',
+'40j4RoqmLiivqzRObbQ4BF',
+'423EcxblW9F4nnQkqcqMlK',
+'2yJ9GVCLMmzBBfQAnfzlwr',
+'34KUIBsIUiPV7oCIzSdDAU',
+'1NbBNVSjRfj4jsZCMQ3D9l',
+'5y5REf9y44dGuMAHHN3R2L',
+'156LzfvMNKuXuiot4uzhGD',
+'2ZdCrBA52bb4pIG3tOOZiQ',
+'2TlGQg8UKymxu3frqMXeO2',
+'6225vlQNgif1W5dE5KN6Y6',
+'0EgigrGFGb4PHaVNb7fgK7',
+'6zvsh5ev7zJ8gz96bfBnZx',
+'1qsHYUd2c1wFGcn7e63QmG',
+'4VXIryQMWpIdGgYR4TrjT1',
+'44sQXptPXVOrYvcvf9TSUk',
+'7la8N6YLMUDAXl2iAEe9Sy',
+'6N3oYlfZ2RPdjMYdHCRmFS',
+'24qj0Qd0qjiqJlejTIA6ik',
+'4pCEIQ6wBVuaJdER5bALtO',
+'2u3EyuCqqV31woqGvO9LBz',
+'04aqUZa6iLLzRoK5eEb7Zh',
+'2jLb0PsBm7OjcvGvVyajua',
+'4MOy68Xuz84lkfu1NQH6Bg',
+'2DsdZx34mT4jVtnPk1eoFM',
+'3VygfAvvgVaJUeaBUSzlZu',
+'3JnbauRAM5tvB042wbuorJ',
+'6dDcfbMUFkFDk6x93kITY7',
+'42er1na9BHF1ERol51wg8M',
+'3nXrCAE44KlevAkQB2XWcN',
+'217aRtYP4ExBpSNEAVNJkR',
+'2g1KggY9PKvsoEAOaiz4xx',
+'6IIPfyGQp3SyOcLRO68dWJ',
+'71DxDMPiElIeGgvJvtITXR',
+'1lguQJjlNrIOoOylYVZN3M',
+'2J4P46vCFm1rPkNkp9pZWX',
+'53oWwSxPuyH2cjYKXH8fgO',
+'0jiW3PNiHJxOhWh9oPBJ7m',
+'14Bljc3pOOG0xQX3wqhLN9',
+'0RLLvYBopDwooCyvnTwgYu',
+'6arLnfArtdWKOcCYzDd4rS',
+'7klPHv3HnXdUY3dSfTccNc',
+'5uWsTciqKP9yjq9VenPWyR',
+'6GskIhdM6TN6EkPgeSjVfW',
+'12PNcnMsjsZ3eHm62t8hiy']
+
+
 client = SpotifyClient(test_tracks, playlist_name='test')
 print(client._url)
