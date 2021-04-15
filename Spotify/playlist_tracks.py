@@ -21,8 +21,7 @@ playlist_link = 'https://open.spotify.com/playlist/0YBpZXJkBtIQAdrVP48uCl?si=1ea
 
 def get_total_track_ids(playlist_link) -> list:
     """
-    Given the user's playlist URI, return a list of track ids included in the playlist,
-    excluding the tracks that do not exist in the dataset.
+    Given the user's playlist URI, return a list of track ids included in the playlist.
     """
     total_song_id_list = []
     playlist_id = parse_link_to_id(playlist_link)

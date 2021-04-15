@@ -2,6 +2,7 @@ import random
 from collections import deque
 import pickle
 # import sys
+from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import spotipy
@@ -141,7 +142,7 @@ class Graph:
                     continue
             else:
                 # Handle song not in graph
-                pos = self.get_new_song_pos()
+                pos = self.get_new_song_pos(input_song_id)
                 new_song = Point(pos, input_song_id)
                 self.init_new_point(new_song)
 
@@ -268,7 +269,45 @@ def generate_id(size=16, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefgh
 def generate_random_points(dimension, num):
     return [Point([random.uniform(-10.0, 10.0) for j in range(dimension)], generate_id()) for i in range(num)]
 
+
 if __name__ == '__main__':
+    """
+    Given kmeans clusters:
+    - Make each cluster into Graph object
+    - Initialize edges for each Graph
+    - Save all clusters (mapping of Graph centroid to Graph_Save)
+    """
+    # Parse args
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument('--epsilon', type=float)
+    arg_parser.add_argument('--input-kmeans-clusters-file-name', type=str)
+    arg_parser.add_argument('--output-graphs-file-name', type=str)
+    args = arg_parser.parse_args()
+
+    # Restore kmeans
+    kmeans_cluster_file = open(args.input_kmeans_clusters_file_name, 'rb')
+    centroid_to_cluster = pickle.load(file=kmeans_cluster_file)
+
+    # Create Graphs from clusters
+    # Initialize edges for each Graph
+    # Map centroid to Graph_Save
+    centroid_to_graph_save = dict()
+    for centroid in centroid_to_cluster:
+        cur_cluster = centroid_to_cluster[centroid]
+        cur_graph = Graph(points=cur_cluster, epsilon=args.epsilon)
+        cur_graph.init_edges()
+        cur_graph_save = Graph_Save()
+        cur_graph_save.save(cur_graph)
+        centroid_to_graph_save[centroid] = cur_graph_save
+
+    # Pickle centroid_to_graph_save
+    save_file = open(args.output_graphs_file_name, 'wb')
+    pickle.dump(obj=centroid_to_graph_save, file=save_file, protocol=pickle.HIGHEST_PROTOCOL)
+    save_file.close()
+
+    # Dev only
+    """
+    # Get a cluster (From kmeans or randomly generate)
     pickle_file = open(f'Cluster_Final.pickle', 'rb')
     centroid_to_clusters = pickle.load(file=pickle_file)
     clusters = list(centroid_to_clusters.values())
@@ -279,25 +318,30 @@ if __name__ == '__main__':
     c = smallest_cluster
     # c = generate_random_points(3, 100)
 
-
+    # Make graph
     g = Graph(points=c, epsilon=0.4)
+    # g = Graph(points=c, epsilon=7)    # For randomly generated cluster
     g.init_edges()
     # g.draw_with_matplotlib()
 
-    g.save_state(file_name='Cluster_State')
+    # Save 
+    g.save_state(file_name='Graph_Test')
 
+    # Take first ten songs from cluster and use as input to recommend songs
     input_songs = [song.id for song in c[:10]]
     recommendations, fails = g.recommend(input_song_ids=input_songs, adventure=5)
     print('Recommendations:', recommendations)
     print('Fails:', fails)
-    #
+
+    # Assert: Input is not found in recommendation
     input_in_recommendation = set(input_songs).intersection(set(recommendations)) != set()
     assert not input_in_recommendation
 
     # Test unpickling
     g_copy = Graph()
-    g_copy.restore_from_state(file_name='Cluster_State')
-    #
+    g_copy.restore_from_state(file_name='Graph_Test')
+
+    # Assert: Graph restores properly
     points_restored = set(map(str, g.points)) == set(map(str, g_copy.points))
     assert points_restored
     epsilon_restored = g.epsilon == g_copy.epsilon
@@ -307,3 +351,4 @@ if __name__ == '__main__':
     assert id_point_mapping_restored
     song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
     assert song_ids_restored
+    """
