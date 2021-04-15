@@ -4,12 +4,13 @@ Tkinter.
 
 """
 
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 import tkinter as tk
 from tkinter import ttk as ttk
 from PIL import ImageTk, Image
 import urllib
 import webbrowser
+# import k_means import *
 
 
 class UserPlaylistEntry:
@@ -33,10 +34,11 @@ class UserPlaylistEntry:
         self.scale_entry = ''
         # self.playlist_length_entry = ''
         self.new_playlist_name = ''
-        self.dimension = ''
+        self.visualization = ''
         self.att_1 = ''
         self.att_2 = ''
         self.att_3 = ''
+        self.graph_int = ''
 
         self._image = Image.open('Spotify-Logo.png').resize((140, 100))
 
@@ -52,8 +54,8 @@ class UserPlaylistEntry:
         # self.length_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
         self._inner_string = tk.StringVar(self.root)
-        self._inner_string.set('Choose Dimension')
-        dimension_options = ["2D", "3D"]
+        self._inner_string.set('Choose Visualization')
+        dimension_options = ["K-means", "Individual Graph"]
         self._dimension_menu = tk.OptionMenu(self.root, self._inner_string, *dimension_options)
 
         self._dimension_menu.config(bg='#1DB954')
@@ -62,7 +64,7 @@ class UserPlaylistEntry:
                              'Instrumentalness', 'Valence', 'Tempo', 'Liveness', 'Loudness',
                              'Speechness', 'Key']
         self._inner_string_att1 = tk.StringVar(self.root)
-        self._inner_string_att1.set('Attribute 1 ')
+        self._inner_string_att1.set('Attribute 1')
         self._attribute1_menu = tk.OptionMenu(self.root, self._inner_string_att1,
                                               *attribute_options)
         self._attribute1_menu.config(bg='#1DB954')
@@ -79,6 +81,8 @@ class UserPlaylistEntry:
         self._attribute3_menu = tk.OptionMenu(self.root, self._inner_string_att3, *attribute_options)
 
         self._attribute3_menu.config(bg='#1DB954')
+
+        self._graph_int_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
     def run_window(self) -> None:
         """Runs a new Tkinter window"""
@@ -115,8 +119,11 @@ class UserPlaylistEntry:
 
         self._new_playlist_name_entry.grid(ipadx=30)
 
+        tk.Button(self.root, text='ENTER', command=self.get_user_input, padx=5,
+                  pady=5, bg='#1DB954').grid()
+
         tk.Label(self.root, text='FOR VISUALIZATION \n Please choose a dimension.',
-                 font=("Proxima nova", "9", "bold")).grid()
+                 font=("Proxima nova", "9", "bold")).grid(pady=30)
 
         self._dimension_menu.grid()
 
@@ -124,22 +131,20 @@ class UserPlaylistEntry:
                  font=("Proxima nova", "9", "bold")).grid()
         self._attribute1_menu.grid()
 
-        tk.Label(self.root, text='Please choose your second attribute',
+        tk.Label(self.root, text='Please choose your second different attribute',
                  font=("Proxima nova", "9", "bold")).grid()
         self._attribute2_menu.grid()
 
-        tk.Label(self.root, text='IF APPLICABLE, choose your third attribute',
+        tk.Label(self.root, text='IF APPLICABLE, choose your third different attribute',
                  font=("Proxima nova", "9", "bold")).grid()
         self._attribute3_menu.grid()
 
-        tk.Button(self.root, text='ENTER', command=self.get_user_input, padx=5,
-                  pady=5, bg='#1DB954').grid()
+        tk.Label(self.root, text='IF CHOSEN GRAPH: Enter an integer 1-100',
+                     font=("Proxima nova", "9", "bold")).grid()
+        self._graph_int_entry.grid()
 
-        # We need to quit out of the window when the user has inputted all of the entries.
-        # if self.playlist_entry != '' and self.scale_entry != '' \
-        #         and self.playlist_length_entry != '':
-        #
-        #     self.root.destroy()
+        tk.Button(self.root, text='VISUALIZE', command=self.visualize, padx=5,
+                  pady=5, bg='#1DB954').grid(pady=15)
 
     def get_user_input(self) -> None:
         """Responsible for storing the link inputted by the user
@@ -153,39 +158,56 @@ class UserPlaylistEntry:
         # Here we update the scale entry attribute
         self.scale_entry = self._slider.get()
 
-        # Here we update the desired new playlist
-        # self.playlist_length_entry = self.length_entry.get()
-
         # Update the desired new playlists name
         self.new_playlist_name = self._new_playlist_name_entry.get()
 
-        self.dimension = self._inner_string.get()
+        if self.playlist_entry != '' and self.scale_entry != '' \
+                and self.new_playlist_name != '':
+
+            tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
+                     font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
+
+    def visualize(self) -> None:
+        """A method that is designed to be used as a button command for the visualize button at the
+        bottom of the Tkinter window"""
+
+        self.visualization = self._inner_string.get()
         self.att_1 = self._inner_string_att1.get()
         self.att_2 = self._inner_string_att2.get()
         self.att_3 = self._inner_string_att3.get()
+        self.graph_int = self._graph_int_entry.get()
 
-        # if int(self.playlist_length_entry) > 100:
-        #     print('Enter a number between 0 - 100')
+        attribute1 = self.att_1
+        attribute2 = self.att_2
+        attribute3 = self.att_3
 
-        # We need to quit out of the window when the user has inputted all of the entries.
-        if self.playlist_entry != '' and self.scale_entry != '' \
-                and self.new_playlist_name != '' and (self.dimension != '' or
-                                                      self.dimension != 'Choose Dimension'):
-                # and int(self.playlist_length_entry) <= 100:
-            # Since now we know all inputs are recorded, we can automatically quit the window
+        if self.visualization == 'K-means':
+            # Run the 2D Function
+            pass
+
+        if (self.visualization != 'Choose Visualization' or
+            self.visualization != '') and (self.att_1 != '' or
+            self.att_1 != 'Attribute 1') and (self.att_2 != '' or
+            self.att_2 != 'Attribute 2') and (self.att_3 != '' or
+                                              self.att_3 != 'Attribute 3'):
+
+            # If the input is higher than 100, automatically set to the highest (100)
+            if isinstance(int(self.graph_int), int) and int(self.graph_int) > 100:
+                self.graph_int = 100
+
+            print(self.playlist_entry)
+            print(self.scale_entry)
+            print(self.new_playlist_name)
+            print(self.visualization)
+            print(self.att_1)
+            print(self.att_2)
+            print(self.att_3)
+            print(self.graph_int)
 
             self.root.destroy()
-            print('YOUR INFORMATION HAS BEEN RECORDED.')
+            print('YOUR VISUALIZATION INFORMATION HAS BEEN RECORDED AS WELL')
+            print('PROGRAM HAS CLOSED ON ITS OWN.')
             print('THANK YOU!')
-
-        # print(self.playlist_entry)
-        # print(self.scale_entry)
-        # print(self.playlist_length_entry)
-        # print(self.new_playlist_name)
-        print(self.dimension)
-        print(self.att_1)
-        print(self.att_2)
-        print(self.att_3)
 
 
 class NewPlaylistOutput:
@@ -202,25 +224,89 @@ class NewPlaylistOutput:
     link: str
     old_averages: Dict[str, float]
 
-    def __init__(self, root: Any, link: str) -> None:
+    def __init__(self, root: Any, link: str, old_average: Dict[str, float]) -> None:
         """Initialize the class and its attributes"""
 
         self.root = root
         self.link = link
+        self.old_averages = old_average
 
         self._image = Image.open('Spotify-Logo.png').resize((140, 100))
 
         self._link_button = tk.Button(self.root, text='OPEN LINK!', command=self.open_link, padx=5,
                                       pady=5, bg='#1DB954')
-        self._acoustic_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._dance_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._energy_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._instrument_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._valence_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._tempo_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._liveness_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._loud_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
-        self._speech_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300)
+
+        style_acoustic = ttk.Style()
+        style_acoustic.theme_use('alt')
+        style_acoustic.configure("orange.Horizontal.TProgressbar", foreground='orange',
+                                 background='orange')
+
+        self._acoustic_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                      style='orange.Horizontal.TProgressbar')
+
+        style_dance = ttk.Style()
+        style_dance.theme_use('alt')
+        style_dance.configure("red.Horizontal.TProgressbar", foreground='red',
+                              background='red')
+
+        self._dance_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                   style='red.Horizontal.TProgressbar')
+
+        style_energy = ttk.Style()
+        style_energy.theme_use('alt')
+        style_energy.configure("blue.Horizontal.TProgressbar", foreground='blue',
+                               background='blue')
+
+        self._energy_progress_bar = ttk.Progressbar(self.root, style='blue.Horizontal.TProgressbar',
+                                                    length=300, orient='horizontal')
+
+        style_instrument = ttk.Style()
+        style_instrument.theme_use('alt')
+        style_instrument.configure("yellow.Horizontal.TProgressbar", foreground='yellow',
+                                   background='yellow')
+
+        self._instrument_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                        style="yellow.Horizontal.TProgressbar")
+
+        style_valence = ttk.Style()
+        style_valence.theme_use('alt')
+        style_valence.configure("violet.Horizontal.TProgressbar", foreground='violet',
+                                background='violet')
+
+        self._valence_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                     style="violet.Horizontal.TProgressbar")
+
+        style_tempo = ttk.Style()
+        style_tempo.theme_use('alt')
+        style_tempo.configure("turquoise.Horizontal.TProgressbar", foreground='turquoise',
+                              background='turquoise')
+
+        self._tempo_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                   style="turquoise.Horizontal.TProgressbar")
+
+        style_liveness = ttk.Style()
+        style_liveness.theme_use('alt')
+        style_liveness.configure("pink.Horizontal.TProgressbar", foreground='pink',
+                                 background='pink')
+
+        self._liveness_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                      style="pink.Horizontal.TProgressbar")
+
+        style_loud = ttk.Style()
+        style_loud.theme_use('alt')
+        style_loud.configure("lavender.Horizontal.TProgressbar", foreground='lavender',
+                             background='lavender')
+
+        self._loud_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                  style="lavender.Horizontal.TProgressbar")
+
+        style_loud = ttk.Style()
+        style_loud.theme_use('alt')
+        style_loud.configure("green.Horizontal.TProgressbar", foreground='green',
+                             background='green')
+
+        self._speech_progress_bar = ttk.Progressbar(self.root, orient='horizontal', length=300,
+                                                    style="green.Horizontal.TProgressbar")
 
     def run_window(self) -> None:
         """
@@ -246,8 +332,50 @@ class NewPlaylistOutput:
         tk.Label(self.root, text="DID YOU KNOW?! \n These are your old playlist's stats:",
                  font=("Proxima nova", "9", "bold")).grid(pady=25)
 
-        self._acoustic_progress_bar['value'] = 80
-        self._acoustic_progress_bar.grid(pady=30)
+        tk.Label(self.root, text=f"Avr. Acousticness: {self.old_averages['Acousticness']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._acoustic_progress_bar['value'] = self.old_averages['Acousticness']
+        self._acoustic_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Danceability: {self.old_averages['Danceability']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._dance_progress_bar['value'] = self.old_averages['Danceability']
+        self._dance_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Energy: {self.old_averages['Energy']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._energy_progress_bar['value'] = self.old_averages['Energy']
+        self._energy_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Instrumentalness: {self.old_averages['Instrumentalness']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._instrument_progress_bar['value'] = self.old_averages['Instrumentalness']
+        self._instrument_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Valence: {self.old_averages['Valence']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._valence_progress_bar['value'] = self.old_averages['Valence']
+        self._valence_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Tempo: {self.old_averages['Tempo']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._tempo_progress_bar['value'] = self.old_averages['Tempo']
+        self._tempo_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Liveness: {self.old_averages['Liveness']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._liveness_progress_bar['value'] = self.old_averages['Liveness']
+        self._liveness_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Loudness: {self.old_averages['Loudness']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._loud_progress_bar['value'] = self.old_averages['Loudness']
+        self._loud_progress_bar.grid(pady=5)
+
+        tk.Label(self.root, text=f"Avr. Speechiness: {self.old_averages['Speechiness']}",
+                 font=("Proxima nova", "9", "bold")).grid(pady=5)
+        self._speech_progress_bar['value'] = self.old_averages['Speechiness']
+        self._speech_progress_bar.grid(pady=5)
 
     def open_link(self) -> None:
         """Function that is used to be the command for the button of the tkinter window to go
@@ -268,8 +396,8 @@ def calc_diff_btwn_playlists(old_playlist: List[list], new_playlist: List[list])
 
     >>> list1 = [[1.0, 1.0, 1.0, 1.0], [0.8, 0.8, 0.8, 0.8]]
     >>> list2 = [[1.1, 1.1, 1.2, 1.2], [0.5, 0.5, 0.7, 0.8]]
-    # >>> calc_diff_btwn_playlists(list1, list2)
-    # [0.2, 0.2, 0.15, 0.1]
+    >>> calc_diff_btwn_playlists(list1, list2)
+    [0.2, 0.2, 0.15, 0.1]
 
 
     """
@@ -324,19 +452,27 @@ def get_input_playlist_averages() -> list[float]:
 
 
 if __name__ == "__main__":
-    # root = tk.Tk()
-    # BE = UserPlaylistEntry(root)
-    # BE.run_window()
-    # root.mainloop()
-    #
-    root2 = tk.Tk()
-    window = NewPlaylistOutput(root2, 'https://open.spotify.com/playlist/1zKz3iMcIOHicoacBa24jo?si=M4S5RXJQQ5CsjjYPLGWkRw')
-    window.run_window()
-    root2.mainloop()
+    root = tk.Tk()
+    BE = UserPlaylistEntry(root)
+    BE.run_window()
+    root.mainloop()
 
-    import doctest
-    doctest.testmod()
+    # root2 = tk.Tk()
+    # window = NewPlaylistOutput(root2, 'https://open.spotify.com/playlist/1zKz3iMcIOHicoacBa24jo?si=M4S5RXJQQ5CsjjYPLGWkRw', {'Acousticness': 80,
+    #                                                                                                                          'Danceability': 50,
+    #                                                                                                                          'Energy': 30,
+    #                                                                                                                          'Instrumentalness': 10,
+    #                                                                                                                          'Valence' : 55,
+    #                                                                                                                          'Tempo': 40,
+    #                                                                                                                          'Liveness': 95,
+    #                                                                                                                          'Loudness': 60,
+    #                                                                                                                          'Speechiness': 99})
+    # window.run_window()
+    # root2.mainloop()
 
-    list1 = [[1, 1, 1, 1], [0.8, 0.8, 0.8, 0.8]]
-    list2 = [[1.1, 1.1, 1.2, 1.2], [0.5, 0.5, 0.7, 0.8]]
-    calc_diff_btwn_playlists(list1, list2)
+    # import doctest
+    # doctest.testmod()
+
+    # list1 = [[1, 1, 1, 1], [0.8, 0.8, 0.8, 0.8]]
+    # list2 = [[1.1, 1.1, 1.2, 1.2], [0.5, 0.5, 0.7, 0.8]]
+    # calc_diff_btwn_playlists(list1, list2)
