@@ -32,6 +32,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
 """
 from k_means import KMeansAlgo
+from post_cluster import Graph
 
 
 def k_means_next(k_means: KMeansAlgo) -> None:
@@ -40,6 +41,16 @@ def k_means_next(k_means: KMeansAlgo) -> None:
     the k-means algorithm. The algorithm is the same regardless of the dimension of the dataset."""
     k_means.run_once()
     k_means.graph_2d('acousticness', 'danceability', 4)
+
+
+def visualize_graphing(k_means: KMeansAlgo) -> None:
+    """Shows what the graph looks like for a cluster in the k-means object after
+    it has finished clustering"""
+    k_means.run_n_times(4)
+    cluster = k_means.clusters[list(k_means.clusters)[0]]
+    graph = Graph(cluster, 0.1)
+    graph.init_edges()
+    graph.draw_with_matplotlib()
 
 
 if __name__ == "__main__":
