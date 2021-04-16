@@ -38,7 +38,7 @@ This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne
 """
 
 import pickle
-from typing import Any, List, Dict
+from typing import Any, Dict
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -55,14 +55,26 @@ class UserPlaylistEntry:
     It collects info from the user such as:
     * their desired playlist input's link
     * the scale of their adventurousness
-    * the desired name for their new playlist
+    * the desired name for their new playlist that is to be generated
 
-     When inputted with the button ENTER, another Tkinter window will pop up, from the class
-     NewPlaylistOutput
+     When inputted with the button ENTER, after a few minutes another Tkinter window will pop up,
+     from the class NewPlaylistOutput. If during these minutes the Tkinter window shows as
+     "Not Responding", this is okay, just please wait as computations are being done!
 
     Instance Attributes:
         - root: This instance attribute is used for storing the root of the Tkinter window
-
+        - data_obj: A Data object with all of the raw data
+        - sp: Spotify API
+        - centroid_to_graph: Mapping of centroid point to its associated graph object
+        - ordered_centroids: list of ordered centroid points
+        - playlist_entry: the inputted playlist by the user
+        - scale_entry: the inputted value on scale/slider by the user
+        - new_playlist_name: the desired name of the new playlist to be generated
+        - visualization: the choice of which option to visualize
+        - att_1: the first attribute selected by the user to visualize
+        - att_2: the second attribute selected by the user to visualize
+        - att_3: the third attribute selected by the user to visualize
+        - graph_int: the index of which graph to visualize, selected by the user
     """
 
     root: Any
@@ -96,6 +108,9 @@ class UserPlaylistEntry:
 
     # We only need to initialize the root and core, the latter used for computation on user input
     def __init__(self, root: Any, core: dict) -> None:
+        """
+        Initialize UserPlaylistEntry class
+        """
         # We first initialize the root of our tkinter window
         self.root = root
 
@@ -161,7 +176,8 @@ class UserPlaylistEntry:
         self._graph_int_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
     def run_window(self) -> None:
-        """Runs the Tkinter window for this class"""
+        """Runs the Tkinter window for this class
+        """
 
         self.root.title('Spotify Recommender')
 
@@ -225,6 +241,9 @@ class UserPlaylistEntry:
         It then passes it on to NewPlaylistOutput, to create a Top Level window for user to
         access the newly generated Spotify Playlist
 
+        Lastly, it also computes the normalized averages of the attributes of the old
+        inputted playlist. Assigned as a dictionary, and passed on to NewPlaylistOutput
+        to display with bar graphs.
         """
 
         # Here we update the playlist entry attribute
@@ -310,8 +329,7 @@ class UserPlaylistEntry:
         """A method that is designed to be used as a button command for the visualize button at the
         bottom of the Tkinter window
 
-        This also stores the user inputs of for the visualization (visual-type, att 1-3, graph-int)
-
+        This also stores the user inputs of for the visualization (visual-type, atts 1-3, graph-int)
         """
         # Record all the user input for visualization
         self.visualization = self._inner_string.get()
@@ -366,6 +384,9 @@ class NewPlaylistOutput:
     This class is responsible for outputting the link to the final generated playlist, for the user
     to open and listen to.
 
+    Within this window there is also a DID YOU KNOW?! section, where the normalized
+    averages of the playlist's song attributes are being displayed with bars.
+
     Instance Attributes:
         - root: This instance attribute is used for storing the root of the Tkinter window
 
@@ -373,9 +394,7 @@ class NewPlaylistOutput:
 
         - old_averages: This is a dictionary mapping attribute type to its average from all the
         songs in a playlist, this will be used to display the averages bars in the DID YOU KNOW?!
-        section
-
-
+        section.
     """
     root: Any
     link: str
@@ -487,9 +506,8 @@ class NewPlaylistOutput:
 
         has an 'OPEN LINK' button which opens the link of the newly generated playlist
 
-        At the end, there is a DID YOU KNOW?! section where the song attribute averages of the
-        old inputted playlist are displayed with bars
-
+        At the end, there is a DID YOU KNOW?! section where the normalized song attribute
+        averages of the old inputted playlist are displayed with bars
         """
 
         self.root.title('Spotify Recommender')
@@ -562,7 +580,6 @@ class NewPlaylistOutput:
         to the link of the new playlist
 
         It uses the webbrowser module to open a new tab in your browser
-
         """
 
         webbrowser.open_new(self.link)
