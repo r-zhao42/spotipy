@@ -39,17 +39,22 @@ import pandas as pd
 
 
 class Data:
-    """A class to store the the un-normalized music data for normalization purposes.
-     This class is used to normalize new song data in the post_cluster module"""
+    """
+    A class to store the the un-normalized music data for normalization purposes.
+     This class is used to normalize new song data in the post_cluster module
+     """
     data: pd.DataFrame
 
     def __init__(self) -> None:
-        """Initializes a object that stores the music data as a pandas dataframe. Contains
-        function to normalize any new data based on data in our dataset."""
+        """
+        Initializes a object that stores the music data as a pandas dataframe. Contains
+        function to normalize any new data based on data in our dataset.
+        """
         self.data = pd.read_csv('Data/music_data.csv')
 
     def normalize_value(self, pos: list) -> list:
-        """Normalizes a list of values based on the data in our dataset. Return a new list of
+        """
+        Normalizes a list of values based on the data in our dataset. Return a new list of
         normalized values, doesn't not mutate the original
 
         Preconditions:
@@ -82,7 +87,8 @@ class Data:
 
 
 def normalize_df(df: pd.DataFrame, column_name: str) -> None:
-    """Normalizes every value in the specified column in the dataframe.
+    """
+    Normalizes every value in the specified column in the dataframe.
 
     The normalization is done by finding the min and max value in the column and
     then subtracting every value in by min and dividing by max-min.
@@ -100,7 +106,8 @@ def normalize_df(df: pd.DataFrame, column_name: str) -> None:
 
 def preprocess_data(file_name: str, columns_to_reorder: list, columns_to_normalize: list,
                     processed_name: str, new_file: bool = False) -> pd.DataFrame:
-    """Reads the .csv file stored a Data/file_name and then reorders and normalizes the
+    """
+    Reads the .csv file stored a Data/file_name and then reorders and normalizes the
     columns. A new .csv file is generated named 'normalized_{file_name}.csv in the Data folder.
     This file will also reorganize the columns of the data so that it is easier to access
     the required data and remove the release_date column.

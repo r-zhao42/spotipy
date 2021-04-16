@@ -51,7 +51,8 @@ COLOR_CHOICES = list(plt.cm.colors.cnames)
 
 
 class KMeansAlgo:
-    """Object to store data and methods for executing k-means algorithm. Specifically,
+    """
+    Object to store data and methods for executing k-means algorithm. Specifically,
     the object stores the state of a dataset during a single iteration of k-means. The class
     contains methods to execute the algorithm on the data that is stored.
 
@@ -70,7 +71,8 @@ class KMeansAlgo:
     clusters: dict
 
     def __init__(self, path: str, k: int) -> None:
-        """Initializes the k_means object with k number of centroids that are picked randomly
+        """
+        Initializes the k_means object with k number of centroids that are picked randomly
         from the data points. The initialization also does the first round of clustering based
         on those centroids.
 
@@ -83,22 +85,27 @@ class KMeansAlgo:
         self.clusters = self.update_clusters()
 
     def run_n_times(self, n: int) -> None:
-        """Run the k_means algorithm n times. Function will not run if n <= 0.
+        """
+        Run the k_means algorithm n times. Function will not run if n <= 0.
         """
         for _ in range(n):
             self.run_once()
 
     def run_once(self) -> None:
-        """Runs the k-means algorithm once. The algorithm first finds the new centers of the
+        """
+        Runs the k-means algorithm once. The algorithm first finds the new centers of the
         clusters and then updates the clusters themselves. The function stores the new clusters
-        in it's attributes."""
+        in it's attributes.
+        """
         self.centroids = self.find_new_centroids()
         self.clusters = self.update_clusters()
 
     def update_clusters(self) -> dict:
-        """Sorts every point in self.data into a cluster based on the centroid that the point
+        """
+        Sorts every point in self.data into a cluster based on the centroid that the point
         is closest to. Returns a dictionary mapping each centroid to a list of points which
-        represents the clusters."""
+        represents the clusters.
+        """
         # initialize a dictionary mapping each current centroid to a empty list
         clusters = dict((key, []) for key in self.centroids)
 
@@ -122,8 +129,10 @@ class KMeansAlgo:
         return clusters
 
     def find_new_centroids(self) -> List[Point]:
-        """Returns the new centroids for each cluster based on the average of the attributes of the
-        points in each cluster. The new centroids are returned as a list of Point objects"""
+        """
+        Returns the new centroids for each cluster based on the average of the attributes of the
+        points in each cluster. The new centroids are returned as a list of Point objects.
+        """
         new_centroids = []
 
         # Iterate through the clusters and update each center
@@ -137,7 +146,9 @@ class KMeansAlgo:
         return new_centroids
 
     def print_cluster_len(self) -> None:
-        """Print the lengths of each cluster in self.cluster"""
+        """
+        Print the lengths of each cluster in self.cluster
+        """
         for cluster in self.clusters:
             print(len(self.clusters[cluster]))
 
@@ -149,8 +160,10 @@ class KMeansAlgo:
     #         accumulator.append(self.clusters[cluster])
     #     return accumulator
     def get_clusters(self) -> dict:
-        """Returns the clusters stored in the object as a list of lists where each inner
-        list is a cluster."""
+        """
+        Returns the clusters stored in the object as a list of lists where each inner
+        list is a cluster.
+        """
         return self.clusters
 
     def graph_3d(self, x: str, y: str, z: str, n: int) -> None:
@@ -269,7 +282,9 @@ class KMeansAlgo:
         plt.show()
 
     def find_furthest_n_clusters(self, n: int) -> list:
-        """Returns a list of clusters that are far away from each other"""
+        """
+        Returns a list of clusters that are far away from each other
+        """
         centroids = list(self.clusters)
 
         # Find the distances of every unique pair of centroids and store in list as tuple
@@ -297,10 +312,12 @@ class KMeansAlgo:
 
 
 def _update_centroid(centroid: Point, points: list) -> Point:
-    """Helper function for KMeansAlgo.find_new_centroids.
+    """
+    Helper function for KMeansAlgo.find_new_centroids.
     Returns the new center of the cluster associated with the given centroid. If the
     cluster is empty, then the original centroid is returned. Otherwise, a new Point object
-    is created with the position of the new center is returned."""
+    is created with the position of the new center is returned.
+    """
 
     if len(points) == 0:
         # If the length of the associated cluster is 0, return original centroid
@@ -323,7 +340,8 @@ def _update_centroid(centroid: Point, points: list) -> Point:
 
 
 def load_path(path: str) -> List[List]:
-    """Loads the .csv file at path. This function assumes that the first column represents the id
+    """
+    Loads the .csv file at path. This function assumes that the first column represents the id
     of the song and the rest of the columns represent the position values. The function
     returns a list of lists, where each inner list is a row in the .csv file.
 
@@ -347,7 +365,8 @@ def load_path(path: str) -> List[List]:
 
 
 def initialize_data(data: List[List]) -> List[Point]:
-    """Given a list of lists in the appropriate format, returns a list of Point objects.
+    """
+    Given a list of lists in the appropriate format, returns a list of Point objects.
 
     Precondition:
         - all(type(line[0]) == str for line in data)
