@@ -50,7 +50,7 @@ track_features = {}
 
 def get_total_track_ids(playlist_link: ...) -> list:  # TODO****************************************
     """
-    Given the user's playlist URI, return a list of track ids included in the playlist.
+    Given the user's playlist URL, return a list of track ids included in the playlist.
     """
     total_song_id_list = []
     playlist_id = parse_link_to_id(playlist_link)

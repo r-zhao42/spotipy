@@ -24,7 +24,7 @@ SPOTIPY = spotipy.Spotify(client_credentials_manager=CLIENT_CREDENTIALS_MANAGER)
 
 class Graph:
     """
-    Represents the an individual graph of song vertices
+    Represents an individual graph of song vertices
 
     Instance Attributes:
          - points: ...
