@@ -73,7 +73,7 @@ class SpotifyClient:
             util.prompt_for_user_token(user_id, 'playlist-modify-public',
                                        client_id='daf1fbca87e94c9db377c98570e32ece',
                                        client_secret='1a674398d1bb44859ccaa4488df1aaa9',
-                                       redirect_uri='http://hostname.domain:port/10008')  # http://localhost:10008, I tried something, didnt work
+                                       redirect_uri='http://localhost:10008')
 
         self._tracks = recommended_tracks
         self.url = ''
