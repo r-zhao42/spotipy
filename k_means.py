@@ -61,7 +61,7 @@ class KMeansAlgo:
         - cluster: A dictionary mapping a centroid to a list of Points in that cluster
 
     Representation Invariants:
-        - k > 0
+        - self.k > 0
         - len(self.centroids) > 0
     """
 
