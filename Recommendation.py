@@ -4,17 +4,43 @@ from Spotify.song_ids import get_song_ids
 from Spotify.song_features import get_features
 from Point import Point
 from post_cluster import Graph_Save
+from typing import Any
 
 
 class Recommendation:
-    def __init__(self, playlist_link, adventure, data, sp, centroid_to_graph):
+    """A class to represent a recommendation
+
+    Instance Attributes:
+        - playlist_link: this is the link of the given playlist from the user
+        - adventure: this is an integer which represents the size of adventure they want for their
+        recommendation
+        - data: ...
+        - sp: ...
+        - centroid_to_graph: This is a mapping of ... to graph object
+
+    """
+
+    playlist_link: str
+    adventure: int
+    data: Any
+    sp: Any
+    centroid_to_graph: Any
+
+    def __init__(self, playlist_link, adventure, data, sp, centroid_to_graph) -> None:
+        """
+        Initialize the Recommendation class
+        """
         self.playlist_link = playlist_link
         self.adventure = adventure
         self.data = data
         self.sp = sp
         self.centroid_to_graph = centroid_to_graph
 
-    def action(self):
+    def action(self) -> ...:
+        """
+        Performs the recommendations as described by the comments
+
+        """
         # Get song ids from input playlist link
         # Get normalized features for each song id
         print('Getting song ids, features; and normalizing features...', end='\r')
@@ -57,7 +83,8 @@ class Recommendation:
                 cur_point = Point(pos=cur_song_features, point_id=cur_song_id)
                 for centroid in self.centroid_to_graph:
                     distance_to_centroid = cur_point.distance_from(centroid)
-                    if closest_centroid_distance == None or distance_to_centroid < closest_centroid_distance:
+                    if closest_centroid_distance == None or \
+                            distance_to_centroid < closest_centroid_distance:
                         closest_centroid = centroid
                         closest_centroid_distance = distance_to_centroid
                 song_to_centroid[cur_song_id] = closest_centroid
@@ -92,7 +119,8 @@ class Recommendation:
         # Unlike before, here graph_mutate means: Graph mutated
         if graph_mutate:
             print('Graph(s) were mutated during the recommendation process,', end=' ')
-            print('because the input playlist included song(s) that were not found in the graph file.\n', end='\r')
+            print('because the input playlist included song(s) that were not '
+                  'found in the graph file.\n', end='\r')
             print('Saving mutated Graphs to Graph_Final_Evolve.pickle...')
             centroid_to_graph_save = dict()
             for centroid in self.centroid_to_graph:
@@ -107,6 +135,21 @@ class Recommendation:
             print('Done saving mutated Graphs to Graph_Final_Evolve.pickle!')
         else:
             print('Graph(s) were not mutated during the recommendation process,', end=' ')
-            print('because all songs in the input playlist were found in the graph file.\n', end='\r')
+            print('because all songs in the input playlist were found in the graph file.\n',
+                  end='\r')
 
         return all_recommendations
+
+
+if __name__ == '__main__':
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
+                          'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
+                          'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
+                          'post_cluster'],
+        'allowed-io': [],
+        # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })

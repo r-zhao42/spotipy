@@ -148,7 +148,8 @@ if __name__ == "__main__":
 
     columns_to_normalize = ['duration_ms', 'tempo', 'loudness', 'key']
     # The following function was the one we called to normalize and format our raw data:
-    # preprocess_data(file, columns_more_dropped_titles, columns_to_normalize, 'music_data.csv', True)
+    # preprocess_data(file, columns_more_dropped_titles, columns_to_normalize,
+    # 'music_data.csv', True)
 
     import doctest
     doctest.testmod()
