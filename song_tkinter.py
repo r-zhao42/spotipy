@@ -44,8 +44,9 @@ from tkinter import ttk
 import webbrowser
 from PIL import ImageTk, Image
 from Recommendation import Recommendation
-from Spotify.Spotify_client import SpotifyClient
-from Spotify.song_features import get_features
+from spotify_client import Spotify_Client
+# from Spotify.Spotify_client import SpotifyClient
+# from Spotify.song_features import get_features
 from k_means import KMeansAlgo
 
 
@@ -254,14 +255,19 @@ class UserPlaylistEntry:
                                                   self.centroid_to_graph).action()
 
             # Generating new link
-            new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name).url
+            # new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name).url
+            spotify_instance = Spotify_Client()
+            new_playlist_link = spotify_instance.create_playlist(self.new_playlist_name,
+                                                                 recommended_song_ids)
 
             # Calculating old playlist averages to display
             aves = [0] * 9      # 9 features
             num_songs = 0
             for song_id in recommended_song_ids:
                 num_songs += 1
-                features = self.data_obj.normalize_value(get_features(song_id, self.sp))
+                # features = self.data_obj.normalize_value(get_features(song_id, self.sp))
+                features = self.data_obj.normalize_value(
+                    spotify_instance.get_song_features(song_id))
                 # Removing duration(ms) and key
                 cols_removed_features = features[:3] + features[4:10]
                 for i in range(len(aves)):

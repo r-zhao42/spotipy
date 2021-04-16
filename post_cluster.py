@@ -8,7 +8,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import spotipy
 from Point import Point
 from preprocess import Data
-from Spotify.song_features import get_features
+# from Spotify.song_features import get_features
+from spotify_client import Spotify_Client
 from k_means import KMeansAlgo
 from typing import Any
 
@@ -277,7 +278,8 @@ class Graph:
 
     def get_new_song_pos(self, song_id: str) -> ...:
         """Returns the new position/features/attributes of a new song"""
-        spotify_pos = get_features(song_id, SPOTIPY)
+        spotify_instance = Spotify_Client()
+        spotify_pos = spotify_instance.get_song_features(song_id)
         normalized_pos = DATA.normalize_value(spotify_pos)
         return normalized_pos
 
@@ -465,5 +467,3 @@ if __name__ == '__main__':
     song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
     assert song_ids_restored
     """
-
-

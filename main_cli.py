@@ -1,8 +1,9 @@
 from argparse import ArgumentParser
 import pickle
 
-from Spotify.song_ids import get_song_ids
-from Spotify.song_features import get_features
+# from Spotify.song_ids import get_song_ids
+# from Spotify.song_features import get_features
+from spotify_client import Spotify_Client
 from post_cluster import Graph_Save
 from preprocess import Data
 from Point import Point
@@ -48,10 +49,13 @@ if __name__ == '__main__':
     # Get song ids from input playlist link
     # Get normalized features for each song id
     print('Getting song ids, features; and normalizing features...', end='\r')
-    song_ids = get_song_ids(args.playlist_link, sp)
+    spotify_instance = Spotify_Client()
+    song_ids = spotify_instance.get_song_ids(args.playlist_link)
+    # song_ids = get_song_ids(args.playlist_link, sp)
     song_id_to_features = []
     for song_id in song_ids:
-        features = get_features(song_id, sp)
+        # features = get_features(song_id, sp)
+        features = spotify_instance.get_song_features(song_id)
         normalized_features = data.normalize_value(features)
         song_id_to_features.append([song_id, normalized_features])
     print('Done getting song ids, features; and normalizing features!\n', end='\r')
