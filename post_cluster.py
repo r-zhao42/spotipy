@@ -1,20 +1,53 @@
+"""
+CSC111 Final Project: Playlist Generator
+
+Module Description
+==================
+
+This file is responsible to convert our clusters of points from K-means into connected
+graphs!
+
+It is saves the state of this graphs and has methods to restore them as well.
+
+
+Copyright and Usage Information
+===============================
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
+"""
+
+
 import random
 from collections import deque
 import pickle
-# import sys
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import spotipy
 from Point import Point
 from preprocess import Data
-# from Spotify.song_features import get_features
 from spotify_client import Spotify_Client
 from k_means import KMeansAlgo
 from typing import Any
 
-# Fallback if pickling to / unpickling from custom Graph_Save object doesn't work
-# sys.setrecursionlimit(100000)
 
 DATA = Data()
 CLIENT_CREDENTIALS_MANAGER = spotipy.oauth2.SpotifyClientCredentials(
@@ -27,18 +60,17 @@ class Graph:
     Represents an individual graph of song vertices
 
     Instance Attributes:
-         - points: ...
-         - epsilon: ...
-         - id_point_mapping: ...
-         - song_ids: ...
-
+         - points: list of Point objects
+         - epsilon: float representing a distance
+         - id_point_mapping: a dictionary a str ID to a Point object
+         - song_ids: list of ids
 
     """
 
-    points: ...
-    epsilon: int
-    id_point_mapping: ...
-    song_ids: ...
+    points: list
+    epsilon: float
+    id_point_mapping: dict
+    song_ids: Any
 
     def __init__(self, points=[], epsilon=-1) -> None:
         """Initializes Graph class"""
@@ -49,9 +81,6 @@ class Graph:
 
     def draw_with_matplotlib(self) -> None:
         """Draws and opens a window to display the graph with matplotlib"""
-        # Better way to plot lines would be to actually keep the edges as attribute
-        # so each edge only gets rendered once.
-        # Will fix if time allows.
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
 
@@ -114,7 +143,7 @@ class Graph:
         ax.scatter(xs=xs, ys=ys, zs=zs, color='deeppink')
         plt.show()
 
-    def save_state(self, file_name) -> None:
+    def save_state(self, file_name: str) -> None:
         """
         Saves the current state into a pickle file
         """
@@ -122,28 +151,21 @@ class Graph:
         to_save = Graph_Save()
         to_save.save(self)
         pickle.dump(obj=to_save, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
-        # Fallback:
-        # pickle.dump(obj=self, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
         pickle_file.close()
 
     def restore_from_state(self, file_name) -> None:
         """
         Restores previously saved state from a pickle file
-
         """
         pickle_file = open(f'{file_name}.pickle', 'rb')
         restored = pickle.load(file=pickle_file)
         restored_graph = restored.restore()
-        # Fallback:
-        # restored_graph = pickle.load(file=pickle_file)
+
         pickle_file.close()
         self.points = restored_graph.points
         self.epsilon = restored_graph.epsilon
         self.id_point_mapping = {point.id: point for point in self.points}
         self.song_ids = list(self.id_point_mapping.keys())
-        # Fallback:
-        # self.id_point_mapping = restored_graph.id_point_mapping
-        # self.song_ids = restored_graph.song_ids
 
     def init_edges(self) -> None:
         """Initializes edges within the graph class"""
@@ -170,7 +192,7 @@ class Graph:
                   end='\r')
         print('\r')
 
-    def points_within_epsilon(self, point: ...) -> ...:
+    def points_within_epsilon(self, point: Any) -> Any:
         """Returns the close points, which are within the self.epsilon"""
         close_points = []
         for a_point in self.points:
@@ -180,7 +202,7 @@ class Graph:
                 close_points.append(a_point)
         return close_points
 
-    def closest_point_index(self, point) -> ...:
+    def closest_point_index(self, point) -> Any:
         """
         Returns the index of the closest points
 
@@ -196,7 +218,7 @@ class Graph:
                 closest_point_distance = cur_distance
         return closest_point_index
 
-    def recommend(self, input_song_ids: ..., adventure: ...) -> ...:
+    def recommend(self, input_song_ids: ..., adventure: int) -> ...:
         """
         This is the function responsible for recommendations...
 
@@ -420,7 +442,7 @@ if __name__ == '__main__':
     pickle.dump(obj=centroid_to_graph_save, file=save_file, protocol=pickle.HIGHEST_PROTOCOL)
     save_file.close()
 
-    # Dev only
+    # Dev only, for testing purposes!
     """
     # Get a cluster (From kmeans or randomly generate)
     pickle_file = open(f'Cluster_Final.pickle', 'rb')

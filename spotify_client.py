@@ -7,6 +7,7 @@ Module Description
 This file is made for creating a new playlist for the user,
 getting audio features of a given song id and for
 getting a list of song ids from the user's given playlist.
+Furthermore, this file relies on the usage of the Spotify API!
 
 
 Copyright and Usage Information
@@ -32,9 +33,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
 """
-
+from typing import List, Any
 import spotipy
-from typing import List
 
 
 class Spotify_Client:
@@ -47,24 +47,30 @@ class Spotify_Client:
     #     - _secret_id:
     #         The key that we pass in to secure calls to the Spotify API.
     #     - _redirect_uri:
-    #         The uri enables the Spotify authentication service to automatically relaunch our program when a user runs the application.
+    #         The uri enables the Spotify authentication service to
+    #         automatically relaunch our program when a user runs the application.
+
+    _public_id: Any
+    _secret_id: Any
+    _redirect_uri: Any
 
     def __init__(self) -> None:
         """
-        Initializes the public_id, secret_id and the redirect_uri so that init_user can be called anytime
+        Initializes the public_id, secret_id and the redirect_uri so
+        that init_user can be called anytime
         """
         self._public_id = 'daf1fbca87e94c9db377c98570e32ece'
         self._secret_id = '1a674398d1bb44859ccaa4488df1aaa9'
         self._redirect_uri = 'https://pass-post.netlify.app'
 
-    def init_user(self) -> None:
+    def init_user(self) -> Any:
         """
         Initializes an instance of spotipy.Spotify that is logged in
         """
-        return spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyOAuth(scope="playlist-modify-public",
-                                                                        client_id=self._public_id,
-                                                                        client_secret=self._secret_id,
-                                                                        redirect_uri=self._redirect_uri))
+        return \
+            spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyOAuth(scope="playlist-modify-public",
+                            client_id=self._public_id, client_secret=self._secret_id,
+                            redirect_uri=self._redirect_uri))
 
     def create_playlist(self, playlist_name: str, song_ids: List[str]) -> str:
         """
@@ -120,13 +126,26 @@ class Spotify_Client:
 
 
 if __name__ == '__main__':
-    from pprint import pprint
 
-    song_ids = ['5eI3fMgQoYfYh9NykE78Sn', '70jb2bIurVzYfxhhsRd4ew']
-    playlist_name = 'your recommended songs :)'
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
+                          'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
+                          'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
+                          'post_cluster', 'pprint'],
+        'allowed-io': [],
+        # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })
 
-    instance = Spotify_Client()
-    print(instance.create_playlist(playlist_name, song_ids))
-    pprint(instance.get_song_features('5eI3fMgQoYfYh9NykE78Sn'))
-    pprint(instance.get_song_ids(
-        'https://open.spotify.com/playlist/1fKVI2pKH5EGS0fX2ncoN6'))
+    # For testing purposes!
+    # from pprint import pprint
+    # song_ids_block = ['5eI3fMgQoYfYh9NykE78Sn', '70jb2bIurVzYfxhhsRd4ew']
+    # playlist_name_block = 'your recommended songs :)'
+    #
+    # instance = Spotify_Client()
+    # print(instance.create_playlist(playlist_name_block, song_ids_block))
+    # pprint(instance.get_song_features('5eI3fMgQoYfYh9NykE78Sn'))
+    # pprint(instance.get_song_ids(
+    #     'https://open.spotify.com/playlist/1fKVI2pKH5EGS0fX2ncoN6'))

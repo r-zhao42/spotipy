@@ -45,8 +45,6 @@ import webbrowser
 from PIL import ImageTk, Image
 from Recommendation import Recommendation
 from spotify_client import Spotify_Client
-# from Spotify.Spotify_client import SpotifyClient
-# from Spotify.song_features import get_features
 from k_means import KMeansAlgo
 
 
@@ -173,8 +171,6 @@ class UserPlaylistEntry:
         # We need to save the reference to the image
         label.image = sp_logo
         label.grid()
-
-        # tk.Label(self.root, image=tkimage, font='center').grid()
 
         tk.Label(self.root, text='Enter the link of your Spotify playlist below : ',
                  font=("Proxima nova", "9", "bold")).grid()
@@ -579,7 +575,7 @@ if __name__ == "__main__":
         'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
                           'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
                           'k_means'],
-        'allowed-io': ['UserPlaylistEntry.visualize()'],
+        'allowed-io': ['get_user_input', 'visualize'],
         # the names (strs) of functions that call print/open/input
         'max-line-length': 100,
         'disable': ['E1136']
