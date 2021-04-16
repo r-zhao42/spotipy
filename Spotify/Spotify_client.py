@@ -63,17 +63,18 @@ class SpotifyClient:
     _playlist: Any
 
     def __init__(self, recommended_tracks: ..., playlist_name: str,  # TODO***********
-                 user_id='i2fc15uzt49drjhsp3fjcqqdw') -> None:
+                 authorization_token, user_id='i2fc15uzt49drjhsp3fjcqqdw') -> None:
         """
         :param authorization_token (str): Spotify API token
         :param user_id (str): Spotify user id
         """
         self._user_id = user_id
-        self._authorization_token = \
-            util.prompt_for_user_token(user_id, 'playlist-modify-public',
-                                       client_id='daf1fbca87e94c9db377c98570e32ece',
-                                       client_secret='1a674398d1bb44859ccaa4488df1aaa9',
-                                       redirect_uri='http://localhost:10008')
+        self._authorization_token = authorization_token
+
+            # util.prompt_for_user_token(user_id, 'playlist-modify-public',
+            #                            client_id='daf1fbca87e94c9db377c98570e32ece',
+            #                            client_secret='1a674398d1bb44859ccaa4488df1aaa9',
+            #                            redirect_uri='http://localhost:10008')
 
         self._tracks = recommended_tracks
         self.url = ''

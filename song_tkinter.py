@@ -44,8 +44,8 @@ from tkinter import ttk
 import webbrowser
 from PIL import ImageTk, Image
 from Recommendation import Recommendation
-from Spotify.Spotify_client import SpotifyClient
-from Spotify.song_features import get_features
+from spotify_client import SpotifyClient
+from playlist_tracks import get_features
 from k_means import KMeansAlgo
 
 
@@ -79,6 +79,7 @@ class UserPlaylistEntry:
     att_2: str
     att_3: str
     graph_int: Any
+    token: str
 
     # Private:
     _image: Any
@@ -114,11 +115,14 @@ class UserPlaylistEntry:
         self.att_1 = ''
         self.att_2 = ''
         self.att_3 = ''
+        self.token = ''
         # This we need to initialize to 0
         self.graph_int = 0
 
         # Open the Spotify Logo to later display
         self._image = Image.open('Spotify-Logo.png').resize((140, 100))
+
+        self._token_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
         self._link_entry = tk.Entry(self.root, borderwidth=10, selectbackground='#1DB954')
 
@@ -174,6 +178,15 @@ class UserPlaylistEntry:
         label.grid()
 
         # tk.Label(self.root, image=tkimage, font='center').grid()
+
+        tk.Label(self.root, text='Press "OPEN LINK" button \n Go to link, press '
+                                 'get token (select all options), paste below ',
+                 font=("Proxima nova", "9", "bold")).grid()
+
+        tk.Button(self.root, text='OPEN LINK', command=self.get_token, padx=5,
+                  pady=5, bg='#1DB954').grid()
+
+        self._token_entry.grid()
 
         tk.Label(self.root, text='Enter the link of your Spotify playlist below : ',
                  font=("Proxima nova", "9", "bold")).grid()
@@ -239,53 +252,69 @@ class UserPlaylistEntry:
         # Update the desired new playlists name
         self.new_playlist_name = self._new_playlist_name_entry.get()
 
+        self.token = self._token_entry.get()
+
         # Need to check if user has inputted everything needed, and only then go into this branch
         if self.playlist_entry != '' and self.scale_entry != '' \
-                and self.new_playlist_name != '':
+                and self.new_playlist_name != '' and self.token != '':
 
-            tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
-                     font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
+            try:
 
-            # Recommendation computation from module
-            recommended_song_ids = Recommendation(self.playlist_entry,
-                                                  self.scale_entry,
-                                                  self.data_obj,
-                                                  self.sp,
-                                                  self.centroid_to_graph).action()
+                tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
+                         font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
 
-            # Generating new link
-            new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name).url
+                # Recommendation computation from module
+                recommended_song_ids = Recommendation(self.playlist_entry,
+                                                      self.scale_entry,
+                                                      self.data_obj,
+                                                      self.sp,
+                                                      self.centroid_to_graph).action()
 
-            # Calculating old playlist averages to display
-            aves = [0] * 9      # 9 features
-            num_songs = 0
-            for song_id in recommended_song_ids:
-                num_songs += 1
-                features = self.data_obj.normalize_value(get_features(song_id, self.sp))
-                # Removing duration(ms) and key
-                cols_removed_features = features[:3] + features[4:10]
-                for i in range(len(aves)):
-                    aves[i] += cols_removed_features[i]
+                # Generating new link
+                new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name,
+                                                  self.token).url
 
-            aves = list(map(lambda ave: round(ave / num_songs * 100), aves))
+                # Calculating old playlist averages to display
+                aves = [0] * 9      # 9 features
+                num_songs = 0
+                for song_id in recommended_song_ids:
+                    num_songs += 1
+                    features = self.data_obj.normalize_value(get_features(song_id, self.sp))
+                    # Removing duration(ms) and key
+                    cols_removed_features = features[:3] + features[4:10]
+                    for i in range(len(aves)):
+                        aves[i] += cols_removed_features[i]
 
-            output_playlist_summary = {'Acousticness': aves[0],
-                                       'Danceability': aves[1],
-                                       'Energy': aves[2],
-                                       'Instrumentalness': aves[3],
-                                       'Valence': aves[4],
-                                       'Tempo': aves[5],
-                                       'Liveness': aves[6],
-                                       'Loudness': aves[7],
-                                       'Speechiness': aves[8]}
+                aves = list(map(lambda ave: round(ave / num_songs * 100), aves))
 
-            # Running another Tkinter window (Top Level) to display computations(aka new playlist)
-            output_root = tk.Toplevel()
-            output_window = NewPlaylistOutput(output_root,
-                                              new_playlist_link,
-                                              output_playlist_summary)
-            output_window.run_window()
-            output_root.mainloop()
+                output_playlist_summary = {'Acousticness': aves[0],
+                                           'Danceability': aves[1],
+                                           'Energy': aves[2],
+                                           'Instrumentalness': aves[3],
+                                           'Valence': aves[4],
+                                           'Tempo': aves[5],
+                                           'Liveness': aves[6],
+                                           'Loudness': aves[7],
+                                           'Speechiness': aves[8]}
+
+                # Running another Tkinter window (Top Level) to display
+                # computations(aka new playlist)
+                output_root = tk.Toplevel()
+                output_window = NewPlaylistOutput(output_root,
+                                                  new_playlist_link,
+                                                  output_playlist_summary)
+                output_window.run_window()
+                output_root.mainloop()
+
+            except KeyError:
+                print('1 hour has passed and the authorization token has expired. \n'
+                      'Please follow the same steps to regenerate another token, and try again.')
+
+            except TypeError:
+
+                print('NOTICE: This specific playlist is unavailable with API. '
+                      'Please try another playlist. \n '
+                      'Or, use already working examples found in the main block!')
 
     def visualize(self) -> None:
         """A method that is designed to be used as a button command for the visualize button at the
@@ -338,6 +367,12 @@ class UserPlaylistEntry:
                 graph.draw_with_matplotlib_3d(self.att_1, self.att_2, self.att_3)
         else:
             print('Invalid visualization options input.\nPlease select all options.')
+
+    def get_token(self) -> None:
+        """Function that is used to be the command for the button of the tkinter window to go
+        to the link of the new playlist"""
+
+        webbrowser.open_new("https://developer.spotify.com/console/post-playlists/")
 
 
 class NewPlaylistOutput:

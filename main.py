@@ -4,7 +4,7 @@ CSC111 Final Project: Playlist Generator
 Module Description
 ==================
 
-This is the main file to run the entire program!
+This is the main file to run the entire program! Please see below for some testing tips!
 
 
 Copyright and Usage Information
@@ -30,55 +30,41 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
 """
+from argparse import ArgumentParser
+import tkinter as tk
+import pickle
+import spotipy
+
+from song_tkinter import UserPlaylistEntry, NewPlaylistOutput  # USED???
+from preprocess import Data
+from post_cluster import Graph_Save  # USED???
 
 
-if __name__ == '__main__':
-
-    import python_ta
-    python_ta.check_all(config={
-        'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
-                          'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
-                          'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
-                          'post_cluster'],
-        'allowed-io': [],
-        # the names (strs) of functions that call print/open/input
-        'max-line-length': 100,
-        'disable': ['E1136']
-    })
-
-    from argparse import ArgumentParser
-    import tkinter as tk
-    import pickle
-    import spotipy
-
-    from song_tkinter import UserPlaylistEntry, NewPlaylistOutput #USED???
-    from preprocess import Data
-    from post_cluster import Graph_Save #USED???
+def run_program(graph_file: str) -> None:
+    """
+    Runs the entire program!
+    """
 
     print('Running main.py. Tkinter interface will appear', end=' ')
     print('when everything finishes loading.\n', end='\r')
-
     print('Parsing args...', end='\r')
     arg_parser = ArgumentParser()
     arg_parser.add_argument('--graphs-file-name', type=str)
     args = arg_parser.parse_args()
     print('Done parsing args!\n', end='\r')
-
     # Preprocessed data
     print('Restoring preprocessed data...', end='\r')
     data_obj = Data()
     print('Done restoring preprocessed data!\n', end='\r')
-
     # Spotify
     print('Initializing Spotipy client...', end='\r')
     credentials_manager = spotipy.oauth2.SpotifyClientCredentials(
         'daf1fbca87e94c9db377c98570e32ece', '1a674398d1bb44859ccaa4488df1aaa9')
     sp = spotipy.Spotify(client_credentials_manager=credentials_manager)
     print('Done initializing Spotipy client!\n', end='\r')
-
     # Restore centroid_to_graph
     print('Restoring Graphs... This will take a while (3 - 10 min).', end='\r')
-    graphs_file = open(args.graphs_file_name, 'rb')
+    graphs_file = open(graph_file, 'rb')
     centroid_to_graph_save = pickle.load(file=graphs_file)
     centroid_to_graph = dict()
     for centroid in centroid_to_graph_save:
@@ -86,7 +72,6 @@ if __name__ == '__main__':
         restored_graph = cur_graph_save.restore()
         centroid_to_graph[centroid] = restored_graph
     print('Done restoring Graphs!                                  \n', end='\r')
-
     # Show tkinter
     print('Starting Tkinter interface.\n', end='\r')
     input_window_root = tk.Tk()
@@ -96,3 +81,40 @@ if __name__ == '__main__':
                                            'centroid_to_graph': centroid_to_graph})
     input_window.run_window()
     input_window_root.mainloop()
+
+
+
+
+
+if __name__ == '__main__':
+
+    run_program('Graph_Final.pickle')
+
+    # BE AWARE: This might take some time to load, and also will take a few minutes when you
+    # press enter to generate playlist! It is OKAY, if the Tkinter window is not responding,
+    # please just wait!
+
+    # FOR TA: Working playlist links to test with! (small minority of playlists
+    #         do not work because of API, gives a non-type, presumably API cannot find them)
+
+    # 1. https://open.spotify.com/playlist/7ByDxKg4FmhrHe8GASNr23?si=PZYcv7wdSYy0ObKa724bqw
+    # 2. https://open.spotify.com/playlist/2MaKHEugScv6B9QUPIewYP?si=UeTfsa1jSZiXrxDgndZfww
+    # 3. https://open.spotify.com/playlist/18mqJ0v80L0lyoBm6xF23S
+
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
+    #                       'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
+    #                       'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
+    #                       'post_cluster'],
+    #     'allowed-io': ['run_program'],
+    #     # the names (strs) of functions that call print/open/input
+    #     'max-line-length': 100,
+    #     'disable': ['E1136']
+    # })
+
+
+
+
+
+

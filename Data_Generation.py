@@ -56,4 +56,20 @@ def visualize_graphing(k_means: KMeansAlgo) -> None:
 if __name__ == "__main__":
     k_means = KMeansAlgo('DataGeneration Data/normalized_data_sample.csv', 4)
 
+    # For graph
+    # visualize_graphing(k_means)
 
+    # For K-means
+    # k_means_next(k_means)
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
+                          'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
+                          'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
+                          'post_cluster'],
+        'allowed-io': ['run_program'],
+        # the names (strs) of functions that call print/open/input
+        'max-line-length': 100,
+        'disable': ['E1136']
+    })

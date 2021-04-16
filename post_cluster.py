@@ -6,11 +6,11 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import spotipy
-from Point import Point
 from preprocess import Data
-from Spotify.song_features import get_features
+from playlist_tracks import get_features
 from k_means import KMeansAlgo
 from typing import Any
+from Point import Point
 
 # Fallback if pickling to / unpickling from custom Graph_Save object doesn't work
 # sys.setrecursionlimit(100000)
