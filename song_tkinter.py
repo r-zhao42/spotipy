@@ -8,7 +8,7 @@ This file is made for the user interface of the entire program using Tkinter.
 With the given user input, within this file, tasks are carried out such as returning
 new_generated playlist and also visualizations for K-means and Individual Graph.
 
-new_generated playlist will be returned with a seperate window, where with a button named
+new_generated playlist will be returned with a separate window, where with a button named
 "OPEN LINK!", it opens a new tab in the browser, which is the spotify playlist. This same window
 also displays the attribute averages of the initial playlist inputted by the user.
 
@@ -73,7 +73,7 @@ class UserPlaylistEntry:
     centroid_to_graph: Any
     ordered_centroids: Any
     playlist_entry: str
-    scale_entry: str
+    scale_entry: Any
     new_playlist_name: str
     visualization: str
     att_1: str
@@ -139,7 +139,7 @@ class UserPlaylistEntry:
 
         attribute_options = ['Acousticness', 'Danceability', 'Energy', 'Duration(ms)',
                              'Instrumentalness', 'Valence', 'Tempo', 'Liveness', 'Loudness',
-                             'Speechness', 'Key']
+                             'Speechiness', 'Key']
         self._inner_string_att1 = tk.StringVar(self.root)
         self._inner_string_att1.set('Attribute 1')
         self._attribute1_menu = tk.OptionMenu(self.root, self._inner_string_att1,
@@ -235,7 +235,7 @@ class UserPlaylistEntry:
         self.playlist_entry = self._link_entry.get()
 
         # Here we update the scale entry attribute
-        self.scale_entry = self._slider.get()
+        self.scale_entry = int(self._slider.get())
 
         # Update the desired new playlists name
         self.new_playlist_name = self._new_playlist_name_entry.get()
@@ -244,54 +244,71 @@ class UserPlaylistEntry:
         if self.playlist_entry != '' and self.scale_entry != '' \
                 and self.new_playlist_name != '':
 
-            tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
-                     font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
+            try:
+                tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED.'
+                                         ' \n THANK YOU!',
+                         font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
 
-            # Recommendation computation from module
-            recommended_song_ids = Recommendation(self.playlist_entry,
-                                                  self.scale_entry,
-                                                  self.data_obj,
-                                                  self.sp,
-                                                  self.centroid_to_graph).action()
+                # Recommendation computation from module
+                recommended_song_ids = Recommendation(self.playlist_entry,
+                                                      self.scale_entry,
+                                                      self.data_obj,
+                                                      self.sp,
+                                                      self.centroid_to_graph).action()
 
-            # Generating new link
-            # new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name).url
-            spotify_instance = Spotify_Client()
-            new_playlist_link = spotify_instance.create_playlist(self.new_playlist_name,
-                                                                 recommended_song_ids)
+                # Generating new link
+                # new_playlist_link = SpotifyClient(recommended_song_ids,
+                # self.new_playlist_name).url
+                spotify_instance = Spotify_Client()
+                new_playlist_link = spotify_instance.create_playlist(self.new_playlist_name,
+                                                                     recommended_song_ids)
 
-            # Calculating old playlist averages to display
-            aves = [0] * 9      # 9 features
-            num_songs = 0
-            for song_id in recommended_song_ids:
-                num_songs += 1
-                # features = self.data_obj.normalize_value(get_features(song_id, self.sp))
-                features = self.data_obj.normalize_value(
-                    spotify_instance.get_song_features(song_id))
-                # Removing duration(ms) and key
-                cols_removed_features = features[:3] + features[4:10]
-                for i in range(len(aves)):
-                    aves[i] += cols_removed_features[i]
+                # Calculating old playlist averages to display
+                aves = [0] * 9      # 9 features
+                num_songs = 0
+                for song_id in recommended_song_ids:
+                    num_songs += 1
+                    # features = self.data_obj.normalize_value(get_features(song_id, self.sp))
 
-            aves = list(map(lambda ave: round(ave / num_songs * 100), aves))
+                    features = self.data_obj.normalize_value(
+                        spotify_instance.get_song_features(song_id))
 
-            output_playlist_summary = {'Acousticness': aves[0],
-                                       'Danceability': aves[1],
-                                       'Energy': aves[2],
-                                       'Instrumentalness': aves[3],
-                                       'Valence': aves[4],
-                                       'Tempo': aves[5],
-                                       'Liveness': aves[6],
-                                       'Loudness': aves[7],
-                                       'Speechiness': aves[8]}
+                    # Removing duration(ms) and key
+                    cols_removed_features = features[:3] + features[4:10]
+                    for i in range(len(aves)):
+                        aves[i] += cols_removed_features[i]
 
-            # Running another Tkinter window (Top Level) to display computations(aka new playlist)
-            output_root = tk.Toplevel()
-            output_window = NewPlaylistOutput(output_root,
-                                              new_playlist_link,
-                                              output_playlist_summary)
-            output_window.run_window()
-            output_root.mainloop()
+                aves = list(map(lambda ave: round(ave / num_songs * 100), aves))
+
+                output_playlist_summary = {'Acousticness': aves[0],
+                                           'Danceability': aves[1],
+                                           'Energy': aves[2],
+                                           'Instrumentalness': aves[3],
+                                           'Valence': aves[4],
+                                           'Tempo': aves[5],
+                                           'Liveness': aves[6],
+                                           'Loudness': aves[7],
+                                           'Speechiness': aves[8]}
+
+                # Running another Tkinter window (Top Level) to
+                # display computations(aka new playlist)
+                output_root = tk.Toplevel()
+                output_window = NewPlaylistOutput(output_root,
+                                                  new_playlist_link,
+                                                  output_playlist_summary)
+                output_window.run_window()
+                output_root.mainloop()
+
+            # Case where there may be in song in user playlist that is not recognized by API
+            except TypeError:
+                print('There is a song in this playlist that the Spotipy API cannot read. \n'
+                      'This is because this song is not defined in Spotify but rather '
+                      'it most likely is from a local file. \n Please input a new playlist! ')
+        else:
+            print('Invalid playlist entry inputs.\nPlease input all entries!.')
+
+        print('Playlist generation over. If you want, input another playlist link, \n'
+              'try to visualize, or close window!')
 
     def visualize(self) -> None:
         """A method that is designed to be used as a button command for the visualize button at the
@@ -344,6 +361,8 @@ class UserPlaylistEntry:
                 graph.draw_with_matplotlib_3d(self.att_1, self.att_2, self.att_3)
         else:
             print('Invalid visualization options input.\nPlease select all options.')
+
+        print('Visualization over, you enter another playlist or quit the program.')
 
 
 class NewPlaylistOutput:
@@ -551,67 +570,6 @@ class NewPlaylistOutput:
         """
 
         webbrowser.open_new(self.link)
-
-
-def calc_diff_btwn_playlists(old_playlist: List[list], new_playlist: List[list]) -> list[float]:
-    """Calculates the difference between the old playlist inputted by the user and the
-    new playlist provided by our algorithm
-
-    Preconditions:
-        - len(old_playlist) == len(new_playlist)
-        - all([len(old_playlist[i]) == len(old_playlist[i + 1]) for i in range(len(old_playlist))])
-        - _all_same_number([len(x) for x in old_playlist + new_playlist])
-
-
-    >>> list1 = [[1.0, 1.0, 1.0, 1.0], [0.8, 0.8, 0.8, 0.8]]
-    >>> list2 = [[1.1, 1.1, 1.2, 1.2], [0.5, 0.5, 0.7, 0.8]]
-    >>> calc_diff_btwn_playlists(list1, list2)
-    [0.2, 0.2, 0.15, 0.1]
-
-
-    """
-    columns = []
-
-    # generate an empty list of lists to be used by the algorithm
-    for _ in range(len(old_playlist[0])):
-        columns.append([])
-
-    # print(columns)
-    index = 0
-
-    for i in range(len(old_playlist)):
-        for j in range(len(old_playlist[i])):
-            diff = abs(old_playlist[i][j] - new_playlist[i][j])
-            # print(diff)
-            # print(columns)
-            columns[j].append(diff)
-
-            index += 0
-
-    averages = []
-    for z in range(len(columns)):
-        avr = sum(columns[z]) / len(columns[z])
-        averages.append(avr)
-
-    return averages
-
-
-def _all_same_number(lst: list) -> bool:
-    """Returns whether all the elements in the list are the same number or not
-
-    >>> my_lst = [1, 2, 3, 4, 5]
-    >>> _all_same_number(my_lst)
-    False
-    >>> my_lst2 = [1, 1, 1, 1, 1, 1]
-    >>> _all_same_number(my_lst2)
-    True
-    """
-
-    for i in range(len(lst) - 1):
-        if lst[i] != lst[i + 1]:
-            return False
-
-    return True
 
 
 if __name__ == "__main__":
