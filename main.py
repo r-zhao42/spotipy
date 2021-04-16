@@ -5,6 +5,8 @@ Module Description
 ==================
 
 This is the main file to run the entire program!
+Please use terminal/command prompt to run the file.
+See our Proposal for more info on how to run.
 
 
 Copyright and Usage Information
@@ -51,9 +53,9 @@ if __name__ == '__main__':
     import pickle
     import spotipy
 
-    from song_tkinter import UserPlaylistEntry, NewPlaylistOutput #USED???
+    from song_tkinter import UserPlaylistEntry, NewPlaylistOutput
     from preprocess import Data
-    from post_cluster import Graph_Save #USED???
+    from post_cluster import Graph_Save
 
     print('Running main.py. Tkinter interface will appear', end=' ')
     print('when everything finishes loading.\n', end='\r')
