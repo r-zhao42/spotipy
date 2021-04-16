@@ -36,13 +36,12 @@ This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne
 
 
 import pickle
-
+from typing import Any
 # from Spotify.song_ids import get_song_ids
 # from Spotify.song_features import get_features
 from playlist_tracks import get_song_ids, get_features
 from Point import Point
 from post_cluster import Graph_Save
-from typing import Any
 
 
 class Recommendation:
@@ -53,7 +52,7 @@ class Recommendation:
         - adventure: this is an integer which represents the size of adventure they want for their
         recommendation
         - data: ...
-        - sp: ...
+        - sp: this is the Spotify Client Credential Class
         - centroid_to_graph: This is a mapping of ... to graph object
 
     """
@@ -64,7 +63,8 @@ class Recommendation:
     sp: Any
     centroid_to_graph: Any
 
-    def __init__(self, playlist_link, adventure, data, sp, centroid_to_graph) -> None:
+    def __init__(self, playlist_link: str, adventure: int, data: Any,
+                 sp: Any, centroid_to_graph: Any) -> None:
         """
         Initialize the Recommendation class
         """
@@ -121,7 +121,7 @@ class Recommendation:
                 cur_point = Point(pos=cur_song_features, point_id=cur_song_id)
                 for centroid in self.centroid_to_graph:
                     distance_to_centroid = cur_point.distance_from(centroid)
-                    if closest_centroid_distance == None or \
+                    if closest_centroid_distance is None or \
                             distance_to_centroid < closest_centroid_distance:
                         closest_centroid = centroid
                         closest_centroid_distance = distance_to_centroid
@@ -185,8 +185,8 @@ if __name__ == '__main__':
         'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
                           'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
                           'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
-                          'post_cluster'],
-        'allowed-io': [],
+                          'post_cluster', 'Point', 'playlist_tracks'],
+        'allowed-io': ['Recommendation.action'],
         # the names (strs) of functions that call print/open/input
         'max-line-length': 100,
         'disable': ['E1136']

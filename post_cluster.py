@@ -1,3 +1,42 @@
+"""
+CSC111 Final Project: Playlist Generator
+
+Module Description
+==================
+
+This file is designed to graph the clusters after K-means clustering has been done.
+It is responsible for creating a graph from an arbitrary cluster. It initializes edges
+based on distance calculated by an epsilon. Within this graph, it also saves graph states
+and has graph class methods to restore them when/if needed.
+
+
+
+
+Copyright and Usage Information
+===============================
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
+"""
+
+
 import random
 from collections import deque
 import pickle
@@ -27,7 +66,7 @@ class Graph:
 
     Instance Attributes:
          - points: ...
-         - epsilon: ...
+         - epsilon: a float value...
          - id_point_mapping: ...
          - song_ids: ...
 
@@ -377,7 +416,8 @@ if __name__ == '__main__':
         'extra-imports': ['pickle', 'tkinter', 'PIL', 'urllib', 'webbrowser',
                           'Recommendation', 'Spotify.Spotify_client', 'Spotify.song_features',
                           'k_means', 'spotipy', 'argparse', 'song_tkinter', 'preprocess',
-                          'post_cluster'],
+                          'post_cluster', 'random', 'collections', 'matplotlib.pyplot',
+                          'matplotlib.mplot3d', 'playlist_tracks'],
         'allowed-io': [],
         # the names (strs) of functions that call print/open/input
         'max-line-length': 100,
@@ -465,5 +505,4 @@ if __name__ == '__main__':
     song_ids_restored = set(g.song_ids) == set(g_copy.song_ids)
     assert song_ids_restored
     """
-
 
