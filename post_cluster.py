@@ -61,6 +61,37 @@ class Graph:
         ax.scatter(xs=xs, ys=ys, zs=zs, color='deeppink')
         plt.show()
 
+    def draw_with_matplotlib_3D(self, attr_1, attr_2, attr_3):
+        # Map input str to associated index in pos
+        attr_1, attr_2, attr_3 = list(map(str.lower, [attr_1, attr_2, attr_3]))
+        attribute_to_index = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration(ms)': 3,
+                              'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
+                              'loudness': 8, 'speechiness': 10, 'key': 11}
+
+        x_i = attribute_to_index[attr_1]
+        y_i = attribute_to_index[attr_2]
+        z_i = attribute_to_index[attr_3]
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+
+        dimension = len(self.points[0].pos)
+        xs, ys, zs = [], [], []
+
+        if dimension >= 3:
+            for point in self.points:
+                x, y, z = point.pos[x_i], point.pos[y_i], point.pos[z_i]
+                xs.append(x)
+                ys.append(y)
+                zs.append(z)
+                for neighbour in point.neighbours.values():
+                    neighbour_x, neighbour_y, neighbour_z = neighbour.pos[:3]
+                    ax.plot(xs=[x, neighbour_x], ys=[y, neighbour_y], zs=[z, neighbour_z],
+                            color='blue')
+
+        ax.scatter(xs=xs, ys=ys, zs=zs, color='deeppink')
+        plt.show()
+
     def save_state(self, file_name):
         pickle_file = open(f'{file_name}.pickle', 'wb')
         to_save = Graph_Save()

@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from Point import Point
 
-ATTRIBUTE_TO_INDEX = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration_ms': 3,
+ATTRIBUTE_TO_INDEX = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration(ms)': 3,
                       'instrumentalness': 4, 'valence': 5, 'tempo': 6, 'liveness': 7,
                       'loudness': 8, 'speechiness': 10, 'key': 11}
 COLOR_CHOICES = list(plt.cm.colors.cnames)
@@ -159,15 +159,16 @@ class KMeansAlgo:
         for x, y, and z.
 
         Preconditions:
-             - x in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            - x in {acousticness, danceability, energy, duration(ms), instrumentalness, valence,
             tempo, liveness, loudness, speechiness, key}
-            - y in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            - y in {acousticness, danceability, energy, duration(ms), instrumentalness, valence,
             tempo, liveness, loudness, speechiness, key}
-            - z in {acousticness, danceability, energy, duration_ms, instrumentalness, valence,
+            - z in {acousticness, danceability, energy, duration(ms), instrumentalness, valence,
             tempo, liveness, loudness, speechiness, key}
             - n <= len(self.cluster)
             - x != y != z
         """
+        x, y, z = list(map(str.lower, [x, y, z]))
         # If matplotlib is displaying a graph, clear the graph
         if plt.get_fignums():
             plt.clf()

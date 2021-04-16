@@ -4,13 +4,17 @@ Tkinter.
 
 """
 
+import pickle
 from typing import Any, List, Dict, Optional
 import tkinter as tk
 from tkinter import ttk as ttk
 from PIL import ImageTk, Image
 import urllib
 import webbrowser
-# import k_means import *
+from Recommendation import Recommendation
+from Spotify.Spotify_client import SpotifyClient
+from Spotify.song_features import get_features
+from k_means import KMeansAlgo
 
 
 class UserPlaylistEntry:
@@ -25,9 +29,15 @@ class UserPlaylistEntry:
 
     root: Any
 
-    def __init__(self, root: Any) -> None:
+    def __init__(self, root: Any, core: dict) -> None:
         # We first initialize the root of our tkinter window
         self.root = root
+
+        # Initialize data needed to recommend
+        self.data_obj = core['data_obj']
+        self.sp = core['sp']
+        self.centroid_to_graph = core['centroid_to_graph']
+        self.ordered_centroids = list(self.centroid_to_graph.keys())
 
         # Here we initialize the rest of the class attributes that are user inputs to empty strings
         self.playlist_entry = ''
@@ -78,7 +88,8 @@ class UserPlaylistEntry:
 
         self._inner_string_att3 = tk.StringVar(self.root)
         self._inner_string_att3.set('Attribute 3')
-        self._attribute3_menu = tk.OptionMenu(self.root, self._inner_string_att3, *attribute_options)
+        self._attribute3_menu = tk.OptionMenu(
+            self.root, self._inner_string_att3, *attribute_options)
 
         self._attribute3_menu.config(bg='#1DB954')
 
@@ -140,7 +151,7 @@ class UserPlaylistEntry:
         self._attribute3_menu.grid()
 
         tk.Label(self.root, text='IF CHOSEN GRAPH: Enter an integer 1-100',
-                     font=("Proxima nova", "9", "bold")).grid()
+                 font=("Proxima nova", "9", "bold")).grid()
         self._graph_int_entry.grid()
 
         tk.Button(self.root, text='VISUALIZE', command=self.visualize, padx=5,
@@ -161,17 +172,47 @@ class UserPlaylistEntry:
         # Update the desired new playlists name
         self.new_playlist_name = self._new_playlist_name_entry.get()
 
+        # Omitting regex checks
         if self.playlist_entry != '' and self.scale_entry != '' \
                 and self.new_playlist_name != '':
 
             tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
                      font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
 
-            # spotify has to generate me the link
-            # averages function needs to give me dictionary
+            recommended_song_ids = Recommendation(self.playlist_entry,
+                                                  self.scale_entry,
+                                                  self.data_obj,
+                                                  self.sp,
+                                                  self.centroid_to_graph).action()
 
-            output_root = tk.Tk()
-            output_window = NewPlaylistOutput(output_root, generated_link, averages)
+            new_playlist_link = SpotifyClient(recommended_song_ids, self.new_playlist_name)._url
+
+            aves = [0] * 9      # 9 features
+            num_songs = 0
+            for song_id in recommended_song_ids:
+                num_songs += 1
+                features = self.data_obj.normalize_value(get_features(song_id, self.sp))
+                # Removing duration(ms) and key
+                cols_removed_features = features[:3] + features[4:10]
+                for i in range(len(aves)):
+                    aves[i] += cols_removed_features[i]
+
+            aves = list(map(lambda ave: round(ave / num_songs * 100), aves))
+
+            output_playlist_summary = {'Acousticness': aves[0],
+                                       'Danceability': aves[1],
+                                       'Energy': aves[2],
+                                       'Instrumentalness': aves[3],
+                                       'Valence': aves[4],
+                                       'Tempo': aves[5],
+                                       'Liveness': aves[6],
+                                       'Loudness': aves[7],
+                                       'Speechiness': aves[8]}
+
+            output_root = tk.Toplevel()
+            output_window = NewPlaylistOutput(output_root,
+                                              new_playlist_link,
+                                              output_playlist_summary)
             output_window.run_window()
             output_root.mainloop()
 
@@ -185,46 +226,36 @@ class UserPlaylistEntry:
         self.att_3 = self._inner_string_att3.get()
         self.graph_int = self._graph_int_entry.get()
 
-        attribute1 = self.att_1
-        attribute2 = self.att_2
-        attribute3 = self.att_3
-
         # This is the case where we did not select Graph Visualization, in this case I am doing this
         # in order not to receive type error when checking if self.graph > 100 on line 200
         if self.graph_int == '':
             self.graph_int = 0
-
-        if self.visualization == 'K-means':
-            # Run the 2D Function
-            pass
-
-        else:  # self.visualization == 'Individual Graph'
-
-            # Run 2D Function
-            pass
-
-        if (self.visualization != 'Choose Visualization' and
-            self.visualization != '') and (self.att_1 != '' and
-            self.att_1 != 'Attribute 1') and (self.att_2 != '' and
-            self.att_2 != 'Attribute 2') and (self.att_3 != '' and
-                                              self.att_3 != 'Attribute 3'):
-
+        elif int(self.graph_int) > 100:
             # If the input is higher than 100, automatically set to the highest (100)
-            if int(self.graph_int) > 100:
-                self.graph_int = 100
+            self.graph_int = 100
+        else:
+            # graph_int is valid
+            self.graph_int = int(self.graph_int)
 
-            print(self.playlist_entry)
-            print(self.scale_entry)
-            print(self.new_playlist_name)
-            print(self.visualization)
-            print(self.att_1)
-            print(self.att_2)
-            print(self.att_3)
-            print(self.graph_int)
+        if (self.visualization != 'Choose Visualization' and self.visualization != '') and \
+                (self.att_1 != '' and self.att_1 != 'Attribute 1') and \
+                (self.att_2 != '' and self.att_2 != 'Attribute 2') and \
+                (self.att_3 != '' and self.att_3 != 'Attribute 3'):
 
-            print('YOUR VISUALIZATION INFORMATION HAS BEEN RECORDED AS WELL')
-            print('PROGRAM HAS CLOSED ON ITS OWN.')
-            print('THANK YOU!')
+            if self.visualization == 'K-means':
+                clusters_file = open('Cluster_Final.pickle', 'rb')
+                centroid_to_clusters = pickle.load(file=clusters_file)
+                k_means = KMeansAlgo(path="Data/normalized_data_final.csv", k=1)
+                k_means.clusters = centroid_to_clusters
+                k_means.centroids = list(k_means.clusters)
+                k_means.graph_3d(self.att_1, self.att_2, self.att_3, n=5)
+
+            else:   # self.visualization == 'Individual Graph'
+                centroid = self.ordered_centroids[self.graph_int - 1]
+                graph = self.centroid_to_graph[centroid]
+                graph.draw_with_matplotlib_3D(self.att_1, self.att_2, self.att_3)
+        else:
+            print('Invalid visualization options input.\nPlease select all options.')
 
 
 class NewPlaylistOutput:
@@ -617,9 +648,7 @@ if __name__ == "__main__":
                                    -9.81, 0.396, 1],
         '6gi6y1xwmVszDWkUqab1qw': [0.0104, 0.802, 0.591, 157712, 0, 0.309, 139.864, 0.196, -4.895,
                                    0.225, 8], '1dUHF4RyMmMTveJ0Rby6Xm':
-            [0.126, 0.761, 0.598, 163974, 0, 0.446, 173.897, 0.0839, -7.249, 0.182, 10]}
-
-
+        [0.126, 0.761, 0.598, 163974, 0, 0.446, 173.897, 0.0839, -7.249, 0.182, 10]}
 
     dict2 = {
         '7Djpvy4lZJNI8rTOVLf1H7': [0.0603, 0.75, 0.831, 319853, 0, 0.731, 76.439, 0.0576, -2.601,
@@ -752,9 +781,6 @@ if __name__ == "__main__":
         '05nbZ1xxVNwUTcGwLbp7CN': [0.648, 0.749, 0.398, 226040, 1.26e-06, 0.0859, 80.032, 0.115,
                                    -7.44, 0.171, 5]}
 
-
-
-
     dict3 = {
         '0hPLZrnDgtKxrym1BHjDhd': [0.111, 0.872, 0.591, 205352, 0, 0.696, 131.982, 0.144, -6.952,
                                    0.359, 6],
@@ -849,7 +875,6 @@ if __name__ == "__main__":
         '3o0nkjyy6eZL5lZcEpvJec': [0.452, 0.48, 0.679, 148676, 0, 0.29, 81.186, 0.152, -6.776,
                                    0.264, 4]}
 
-
     dict4 = {
         '5uZm7EFtP5aoTJvx5gv9Xf': [0.308, 0.538, 0.52, 174192, 0, 0.551, 180.274, 0.214, -11.063,
                                    0.737, 7],
@@ -861,7 +886,7 @@ if __name__ == "__main__":
                                    0.884, 7],
         '7gdN2q9kuKAdICPTaYLwEx': [0.55, 0.649, 0.226, 126656, 0, 0.572, 71.34, 0.167, -19.121,
                                    0.964, 10], '1UIGTjooANVp0MkxS9oXPX':
-            [0.304, 0.63, 0.184, 139300, 0, 0.515, 164.91, 0.127, -19.804, 0.859, 7],
+        [0.304, 0.63, 0.184, 139300, 0, 0.515, 164.91, 0.127, -19.804, 0.859, 7],
         '6Dlpszcxh5Gd2HEfAqTtRj': [0.596, 0.75, 0.22, 123756, 0, 0.628, 78.124, 0.178, -18.853,
                                    0.956, 10],
         '5pZTqEAK59vyJLv1KM0y2s': [0.581, 0.735, 0.201, 125820, 0, 0.567, 81.353, 0.17, -20.882,

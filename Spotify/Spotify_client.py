@@ -10,8 +10,8 @@ Furthermore, this file is also necessary in order to add songs and generate them
 
 import json
 from typing import Any
-from Track import Track
-from Playlist import Playlist
+from Spotify.Track import Track
+from Spotify.Playlist import Playlist
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import requests
@@ -40,7 +40,7 @@ class SpotifyClient:
             util.prompt_for_user_token(user_id, 'playlist-modify-public',
                                        client_id='daf1fbca87e94c9db377c98570e32ece',
                                        client_secret='1a674398d1bb44859ccaa4488df1aaa9',
-                                       redirect_uri='http://localhost:8888/callback')
+                                       redirect_uri='http://localhost:10008')
 
         self._tracks = recommended_tracks
         self._url = ''
