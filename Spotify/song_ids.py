@@ -1,4 +1,4 @@
-def get_song_ids(playlist_link, sp) -> list:
+def get_song_ids(playlist_link: str, sp: ...) -> list:  # TODO *********************
     """
     Given playlist URI, return all song ids included in the playlist.
     """
@@ -8,10 +8,16 @@ def get_song_ids(playlist_link, sp) -> list:
     for item in playlist['tracks']['items']:
         song_track = item['track']
         total_song_id_list.append(song_track['id'])
-    return(total_song_id_list)
+
+    return total_song_id_list
 
 
-def parse_link_to_id(playlist_link) -> str:
+def parse_link_to_id(playlist_link: ...) -> str:  # TODO ******************
+    """"
+    This function is responsible for ..., by ...
+
+    It returns the playlist's ID
+    """
     split_url = playlist_link.split('/')
     splitted = split_url[4]
     split_again = splitted.split('?')

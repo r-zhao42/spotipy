@@ -1,4 +1,9 @@
-def get_features(track_id, sp):
+def get_features(track_id: str, sp: ...) -> ...:  # TODO ***************
+    """Gets the features of the song inputted by the argument, track_id
+
+    Returns ...(list? dict?) of the features, IF DICT: Where keys are the attribute names, and
+                                                        values are the averages
+    """
     features = sp.audio_features('spotify:track:' + track_id)
     return([features[0]['acousticness'], features[0]['danceability'], features[0]['energy'],
             features[0]['duration_ms'], features[0]['instrumentalness'], features[
