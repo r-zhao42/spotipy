@@ -1,10 +1,21 @@
 class Track:
     """
-    A Track object represents a single song.
+    A Track object that represents a single song.
+
+    Instance Attributes:
+        - id: the string that represents the unique ID of a given song
+
+
+    Representation Invariants:
+        - isinstance(self.id, str)
+
     """
 
-    def __init__(self, id):
+    id: str
+
+    def __init__(self, id: str) -> None:
         self.id = id
 
-    def create_track_uri(self):
+    def create_track_uri(self) -> str:
+        """Creates and returns the Spotify track URI for an arbitrary song"""
         return "spotify:track:" + self.id

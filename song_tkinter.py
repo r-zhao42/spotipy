@@ -167,6 +167,14 @@ class UserPlaylistEntry:
             tk.Label(self.root, text='YOUR *PLAYLIST* INFORMATION HAS BEEN RECORDED. \n THANK YOU!',
                      font=("Proxima nova", "9", "bold"), fg='white', bg='black').grid()
 
+            # spotify has to generate me the link
+            # averages function needs to give me dictionary
+
+            output_root = tk.Tk()
+            output_window = NewPlaylistOutput(output_root, generated_link, averages)
+            output_window.run_window()
+            output_root.mainloop()
+
     def visualize(self) -> None:
         """A method that is designed to be used as a button command for the visualize button at the
         bottom of the Tkinter window"""
@@ -190,6 +198,11 @@ class UserPlaylistEntry:
             # Run the 2D Function
             pass
 
+        else:  # self.visualization == 'Individual Graph'
+
+            # Run 2D Function
+            pass
+
         if (self.visualization != 'Choose Visualization' and
             self.visualization != '') and (self.att_1 != '' and
             self.att_1 != 'Attribute 1') and (self.att_2 != '' and
@@ -209,7 +222,6 @@ class UserPlaylistEntry:
             print(self.att_3)
             print(self.graph_int)
 
-            self.root.destroy()
             print('YOUR VISUALIZATION INFORMATION HAS BEEN RECORDED AS WELL')
             print('PROGRAM HAS CLOSED ON ITS OWN.')
             print('THANK YOU!')
@@ -457,12 +469,12 @@ def get_input_playlist_averages() -> list[float]:
 
 
 if __name__ == "__main__":
-    # root = tk.Tk()
-    # BE = UserPlaylistEntry(root)
-    # BE.run_window()
-    # root.mainloop()
+    root = tk.Tk()
+    BE = UserPlaylistEntry(root)
+    BE.run_window()
+    root.mainloop()
 
-    # root2 = tk.Tk()
+    root2 = tk.Tk()
     # window = NewPlaylistOutput(root2, 'https://open.spotify.com/playlist/1zKz3iMcIOHicoacBa24jo?si=M4S5RXJQQ5CsjjYPLGWkRw', {'Acousticness': 80,
     #                                                                                                                          'Danceability': 50,
     #                                                                                                                          'Energy': 30,
