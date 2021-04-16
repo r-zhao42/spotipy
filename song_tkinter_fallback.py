@@ -44,8 +44,8 @@ from tkinter import ttk
 import webbrowser
 from PIL import ImageTk, Image
 from Recommendation import Recommendation
-from spotify_client import SpotifyClient
-from playlist_tracks import get_features
+from Spotify.Spotify_client import SpotifyClient
+from Spotify.song_features import get_features
 from k_means import KMeansAlgo
 
 
@@ -312,9 +312,8 @@ class UserPlaylistEntry:
 
             except TypeError:
 
-                print('NOTICE: This specific playlist is unavailable with API. '
-                      'Please try another playlist. \n '
-                      'Or, use already working examples found in the main block!')
+                print('NOTICE: You have a song that is not registered with Spotify \n'
+                      'Please input another playlist!')
 
     def visualize(self) -> None:
         """A method that is designed to be used as a button command for the visualize button at the
