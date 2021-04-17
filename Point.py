@@ -33,8 +33,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
 """
-from typing import Any, List
 from __future__ import annotations
+from typing import Any, List
 
 class Point:
     """

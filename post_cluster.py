@@ -35,6 +35,7 @@ This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne
 """
 
 
+from __future__ import annotations
 import random
 from collections import deque
 import pickle
@@ -47,7 +48,6 @@ from preprocess import Data
 from spotify_client import Spotify_Client
 from k_means import KMeansAlgo
 from typing import Any, List
-from __future__ import annotations
 
 
 DATA = Data()
