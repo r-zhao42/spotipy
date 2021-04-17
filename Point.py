@@ -33,29 +33,41 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 This file is Copyright (c) 2021 Si Yuan Zhao, Hayk Nazaryan, Cliff Zhang, Joanne Pan.
 """
-from typing import Any
+from typing import Any, List
 
 
 class Point:
-    """This class is to represent a song in a graph"""
+    """
+    A song in Graph.
 
-    pos: Any
+    Instance Attributes:
+        - pos: List of floats representing normalized position of point in Graph
+        - id: String representing Song id registered with Spotify
+        - neighbours: Dictionary mapping distance to neighbour
+    """
+
+    pos: List[float]
     id: str
     neighbours: dict
 
     def __init__(self, pos: ..., point_id='NA') -> None:
-        """Initializes Point class"""
+        """
+        Initialize with normalized position, id, and no neighbours
+        """
         self.pos = pos
         self.id = point_id
         self.neighbours = dict()  # distance to Point
 
     def __repr__(self) -> str:
-        """Returns the str of the id"""
+        """
+        Return self.id when converting to string
+        """
         return str(self.id)
 
-    def become_neighbour(self, point: ...) -> None:
+    def become_neighbour(self, point: Point) -> None:
         """
-        ...
+        Add self to point.neighbours
+        Add point to self.neighbours
         """
         distance = self.distance_from(point)
         while distance in self.neighbours:
@@ -63,17 +75,19 @@ class Point:
         self.neighbours[distance] = point
         point.neighbours[distance] = self
 
-    def is_neighbour_with(self, point: ...):
-        """Returns whether a point is neighbours with given point"""
+    def is_neighbour_with(self, point: Point) -> bool:
+        """
+        Return whether a point is neighbours with given point
+        """
         return point in self.neighbours.values()
 
-    def get_neighbour(self, distance: ...) -> ...:
+    def get_neighbour(self, distance: float) -> Point:
         """
-        ...
+        Return neighbour given distance (which represents self's distance from neighbour)
         """
         return self.neighbours[distance]
 
-    def distance_from(self, point) -> ...:
+    def distance_from(self, point: Point) -> float:
         """
         Returns the distance from a given point
         """
