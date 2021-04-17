@@ -274,7 +274,7 @@ class Graph:
         if fails:
             shuffled_songs = random.sample(self.song_ids, len(self.song_ids))
             counter = 0
-            for i in range(fails):
+            for _ in range(fails):
                 random_song = shuffled_songs[counter]
                 blacklist = recommendations + input_song_ids
                 while random_song in blacklist:
