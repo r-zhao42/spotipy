@@ -46,7 +46,7 @@ from Point import Point
 from preprocess import Data
 from spotify_client import Spotify_Client
 from k_means import KMeansAlgo
-from typing import Any
+from typing import Any, List
 
 
 DATA = Data()
@@ -57,14 +57,14 @@ SPOTIPY = spotipy.Spotify(client_credentials_manager=CLIENT_CREDENTIALS_MANAGER)
 
 class Graph:
     """
-    Represents an individual graph of song vertices
+    Represents an individual graph of vertices (songs).
+    Vertices are connected based on an epsilon value, which represents distance.
 
     Instance Attributes:
-         - points: list of Point objects
-         - epsilon: float representing a distance
-         - id_point_mapping: a dictionary a str ID to a Point object
-         - song_ids: list of ids
-
+        - points: list of Point objects
+        - epsilon: float representing a distance
+        - id_point_mapping: a dictionary a str ID to a Point object
+        - song_ids: list of ids
     """
 
     points: list
@@ -73,14 +73,18 @@ class Graph:
     song_ids: Any
 
     def __init__(self, points=[], epsilon=-1) -> None:
-        """Initializes Graph class"""
+        """
+        Initialize Graph class
+        """
         self.points = points
         self.epsilon = epsilon
         self.id_point_mapping = {point.id: point for point in self.points}
         self.song_ids = list(self.id_point_mapping.keys())
 
     def draw_with_matplotlib(self) -> None:
-        """Draws and opens a window to display the graph with matplotlib"""
+        """
+        Draw and display the graph with matplotlib
+        """
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
 
@@ -112,7 +116,11 @@ class Graph:
         plt.show()
 
     def draw_with_matplotlib_3d(self, attr_1: str, attr_2: str, attr_3: str) -> None:
-        """ Draws and opens a window to display the graph with matplotlib but in 3D"""
+        """
+        Draw and display the graph with matplotlib in 3D,
+        This should only be called from song_tkinter.py
+        Otherwise use draw_with_matplotlib
+        """
         # Map input str to associated index in pos
         attr_1, attr_2, attr_3 = list(map(str.lower, [attr_1, attr_2, attr_3]))
         attribute_to_index = {'acousticness': 0, 'danceability': 1, 'energy': 2, 'duration(ms)': 3,
@@ -145,7 +153,7 @@ class Graph:
 
     def save_state(self, file_name: str) -> None:
         """
-        Saves the current state into a pickle file
+        Pickle graph to file
         """
         pickle_file = open(f'{file_name}.pickle', 'wb')
         to_save = Graph_Save()
@@ -153,9 +161,9 @@ class Graph:
         pickle.dump(obj=to_save, file=pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
         pickle_file.close()
 
-    def restore_from_state(self, file_name) -> None:
+    def restore_from_state(self, file_name: str) -> None:
         """
-        Restores previously saved state from a pickle file
+        Unpickle graph from file
         """
         pickle_file = open(f'{file_name}.pickle', 'rb')
         restored = pickle.load(file=pickle_file)
@@ -168,7 +176,12 @@ class Graph:
         self.song_ids = list(self.id_point_mapping.keys())
 
     def init_edges(self) -> None:
-        """Initializes edges within the graph class"""
+        """
+        Initialize edges between songs based on self.epsilon
+        For each point:
+        - Become neighbour (make edge) with all points within self.epsilon
+        - If no points were found in self.epsilon, become neighbour with closest point
+        """
         noise = []
         progress = 0
         for point in self.points:
@@ -192,8 +205,10 @@ class Graph:
                   end='\r')
         print('\r')
 
-    def points_within_epsilon(self, point: Any) -> Any:
-        """Returns the close points, which are within the self.epsilon"""
+    def points_within_epsilon(self, point: Point) -> Any:
+        """
+        Return points within self.epsilon
+        """
         close_points = []
         for a_point in self.points:
             if a_point is point:
@@ -202,10 +217,9 @@ class Graph:
                 close_points.append(a_point)
         return close_points
 
-    def closest_point_index(self, point) -> Any:
+    def closest_point_index(self, point: Point) -> Any:
         """
-        Returns the index of the closest points
-
+        Return index of the closest point (in self.points)
         """
         closest_point_index = -1
         closest_point_distance = -1
@@ -218,10 +232,16 @@ class Graph:
                 closest_point_distance = cur_distance
         return closest_point_index
 
-    def recommend(self, input_song_ids: ..., adventure: int) -> ...:
+    def recommend(self, input_song_ids: List[str], adventure: int) -> tuple:
         """
-        This is the function responsible for recommendations...
-
+        Use self.bfs() to make recommendations for each song.
+        There is fails counter, this counts the number of times when:
+        - self.bfs() can't find any song at depth=adventure
+        - self.bfs() can find at least 1 song at depth=adventure,
+          but all songs at depth=adventure have already been recommended
+        Handle fails:
+        - For each fail: Find random song from self.points, as long as the
+          song is not in previous recommendations
         """
         recommendations = []
         fails = 0      # too many fails means cluster too small and/or adventure too big
@@ -266,9 +286,13 @@ class Graph:
 
         return recommendations, fails
 
-    def bfs(self, root_song_id: ..., adventure: ..., blacklist: ...) -> ...:
+    def bfs(self, root_song_id: str, adventure: int, blacklist: List[str]) -> dict:
         """
-        ...
+        Given a song, use iterative breadth-first search to find a song
+        at depth=adventure.
+        Does not return:
+        - Input (root_song_id) itself
+        - Any song in blacklist
         """
         queue = deque()
         visited = set()
@@ -298,16 +322,22 @@ class Graph:
 
         return {'success': False}
 
-    def get_new_song_pos(self, song_id: str) -> ...:
-        """Returns the new position/features/attributes of a new song"""
+    def get_new_song_pos(self, song_id: str) -> List[float]:
+        """
+        Return normalized position of a new song based on its attributes
+        """
         spotify_instance = Spotify_Client()
         spotify_pos = spotify_instance.get_song_features(song_id)
         normalized_pos = DATA.normalize_value(spotify_pos)
         return normalized_pos
 
-    def init_new_point(self, new_point: ...) -> None:
+    def init_new_point(self, new_point: Point) -> None:
         """
-        Initializes the new songs with their new positions
+        Initialize a new song and give it neighbours (make edges)
+        If there is at least 1 point within self.epsilon:
+        - Become neighbours with all points within self.epsilon
+        Otherwise:
+        - Become neighbours with closest point
         """
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # MAKE SURE THE NEW POINT ACTUALLY BELONGS IN THIS CLUSTER. I.E. CLOSEST TO
@@ -330,29 +360,37 @@ class Graph:
 
 
 class Graph_Save:
-    """This is a class, made custom, to minimize the recursion of pickling because our dataset
-    is too big and we have done this to avoid recursion error
+    """
+    To avoid recursion error when pickling Graph objects, convert Graph objects
+    to Graph_Save objects first, then pickle / unpickle, and restore Graph objects
+    from Graph_Save objects.
+
+    Additionally it minimizes pickle file sizes.
+    (albeit it's still big with big datasets)
 
     Instance Attributes:
         - points: ...
         - edges: ...
         - epsilon: ...
-
     """
 
     points: ...
     edges: ...
     epsilon: ...
 
-    # To minimize .pickle file size and avoid pickle recursion error
     def __init__(self) -> None:
-        """Initializes the Graph_Save class"""
+        """
+        Initialize a Graph_Save object with no data
+        """
         self.points = set()
         self.edges = set()
         self.epsilon = -1
 
     def save(self, graph: Graph) -> None:
-        """A method designed to save the graph"""
+        """
+        Store all meaningful data from Graph object into attributes
+        *meaningful data: Data strictly necessary to restore existing Graph
+        """
         points = set()
         edges = set()
         for point in graph.points:
@@ -365,7 +403,9 @@ class Graph_Save:
         self.epsilon = graph.epsilon
 
     def restore(self) -> Graph:
-        """A method designed to restore the graph"""
+        """
+        Reconstruct from attributes to: Restore and return Graph object
+        """
         points = []
         id_point_mapping = dict()
         for point in self.points:
@@ -382,15 +422,17 @@ class Graph_Save:
 
 
 def generate_id(size=16,
-                alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-') -> Any:
+                alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-') -> str:
     """
-    Generated ids for testing
+    Generate a random id (for testing without kmeans clusters)
     """
     return ''.join(random.choice(alphabet) for i in range(size))
 
 
-def generate_random_points(dimension, num) -> Any:
-    """Generates random points for testing"""
+def generate_random_points(dimension: int, num: int) -> List[Point]:
+    """
+    Generates random points with random ids (for testing without kmeans clusters)
+    """
     return [Point([random.uniform(-10.0, 10.0)
                    for j in range(dimension)], generate_id()) for i in range(num)]
 
