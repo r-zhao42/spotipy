@@ -369,14 +369,15 @@ class Graph_Save:
     (albeit it's still big with big datasets)
 
     Instance Attributes:
-        - points: ...
-        - edges: ...
-        - epsilon: ...
+        - points: Set of tuples: each tuple is (point position, point id)
+        - edges: Set of tuples: each tuple is (point A, point B)
+        - epsilon: Integer representing Graph epsilon value
+          (used for connecting vertices)
     """
 
-    points: ...
-    edges: ...
-    epsilon: ...
+    points: set
+    edges: set
+    epsilon: int
 
     def __init__(self) -> None:
         """
