@@ -47,6 +47,7 @@ from preprocess import Data
 from spotify_client import Spotify_Client
 from k_means import KMeansAlgo
 from typing import Any, List
+from __future__ import annotations
 
 
 DATA = Data()
